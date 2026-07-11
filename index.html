@@ -1,730 +1,1563 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Karma</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>
-:root {
-  --bg:#050505;--bg2:#0a0a0a;--card:#0f0f0f;--card2:#141414;
-  --border:#1e1e1e;--border2:#2a2a2a;--fg:#e8e8e8;--fg2:#a0a0a0;
-  --muted:#555;--accent:#fff;--accent2:#ccc;
-  --glow:rgba(255,255,255,0.04);--glow2:rgba(255,255,255,0.08);
-  --danger:#ff4444;--success:#44ff88;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;}
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-
-.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);
-  background-size:60px 60px;}
-.bg-glow{position:fixed;z-index:0;pointer-events:none;width:500px;height:500px;border-radius:50%;filter:blur(140px);opacity:.25;}
-.bg-g1{top:-150px;left:-100px;background:rgba(255,255,255,0.06);}
-.bg-g2{bottom:-150px;right:-100px;background:rgba(255,255,255,0.03);}
-
-.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
-
-header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(5,5,5,0.9);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;flex-shrink:0;}
-.logo{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:700;letter-spacing:-.5px;}
-.logo-icon{width:34px;height:34px;border:2px solid var(--fg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;}
-.header-right{display:flex;align-items:center;gap:8px;}
-
-.btn{padding:7px 16px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
-.btn-p{background:var(--accent);color:var(--bg);}
-.btn-p:hover{background:var(--accent2);transform:translateY(-1px);}
-.btn-g{background:transparent;color:var(--fg2);border:1px solid var(--border);}
-.btn-g:hover{border-color:var(--border2);color:var(--fg);background:var(--glow);}
-.btn-d{background:rgba(255,68,68,.08);color:var(--danger);border:1px solid rgba(255,68,68,.15);}
-.btn-d:hover{background:rgba(255,68,68,.18);}
-
-.main-wrap{flex:1;display:flex;overflow:hidden;}
-
-/* Sidebar */
-.sidebar{width:270px;min-width:270px;border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:left .3s ease;}
-.sb-head{padding:14px;border-bottom:1px solid var(--border);}
-.new-btn{width:100%;padding:9px 12px;background:var(--card);border:1px dashed var(--border2);border-radius:8px;color:var(--fg2);font-family:'Space Grotesk',sans-serif;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;}
-.new-btn:hover{border-color:var(--fg);color:var(--fg);background:var(--card2);}
-.chat-list{flex:1;overflow-y:auto;padding:6px;}
-.ci{padding:9px 11px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--fg2);transition:all .12s;display:flex;align-items:center;gap:7px;margin-bottom:1px;position:relative;}
-.ci:hover{background:var(--glow);color:var(--fg);}
-.ci.act{background:var(--glow2);color:var(--fg);}
-.ci .del{position:absolute;right:7px;top:50%;transform:translateY(-50%);opacity:0;background:none;border:none;color:var(--muted);cursor:pointer;font-size:10px;padding:4px;transition:opacity .12s;}
-.ci:hover .del{opacity:1;}
-.ci .del:hover{color:var(--danger);}
-.sb-foot{padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
-.sb-foot .btn{width:100%;justify-content:center;}
-
-/* Chat */
-.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:18px;}
-
-/* Welcome */
-.welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
-.w-icon{width:72px;height:72px;border-radius:18px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px;background:var(--glow);animation:wfloat 4s ease-in-out infinite;}
-@keyframes wfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-.welcome h2{font-size:26px;font-weight:700;margin-bottom:7px;letter-spacing:-.5px;}
-.welcome p{color:var(--fg2);font-size:14px;max-width:420px;line-height:1.6;margin-bottom:28px;}
-.qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;max-width:500px;width:100%;}
-.qa{padding:13px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;cursor:pointer;text-align:left;transition:all .2s;font-family:'Space Grotesk',sans-serif;}
-.qa:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px);}
-.qa-i{font-size:16px;margin-bottom:7px;display:block;color:var(--fg2);}
-.qa-t{font-size:12.5px;font-weight:600;color:var(--fg);margin-bottom:2px;}
-.qa-d{font-size:11px;color:var(--muted);line-height:1.35;}
-
-/* Messages */
-.msg{display:flex;gap:11px;max-width:780px;width:100%;margin:0 auto;animation:msgIn .25s ease;}
-@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.msg-av{width:30px;height:30px;min-width:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
-.msg-u .msg-av{background:var(--accent);color:var(--bg);}
-.msg-a .msg-av{background:var(--card2);border:1px solid var(--border2);color:var(--fg2);}
-.msg-c{flex:1;min-width:0;}
-.msg-r{font-size:11px;font-weight:600;margin-bottom:3px;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;}
-.msg-b{font-size:13.5px;line-height:1.7;color:var(--fg);}
-.msg-b p{margin-bottom:7px;}
-.msg-b p:last-child{margin-bottom:0;}
-.msg-b pre{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px;overflow-x:auto;margin:8px 0;position:relative;}
-.msg-b code{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:var(--fg2);}
-.msg-b p code{background:var(--card);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:11.5px;}
-.cpy-btn{position:absolute;top:7px;right:7px;background:var(--border);border:none;color:var(--fg2);padding:3px 7px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .12s;}
-.cpy-btn:hover{background:var(--border2);color:var(--fg);}
-
-.typing{display:flex;gap:4px;padding:4px 0;}
-.typing span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:tdot 1.4s infinite;}
-.typing span:nth-child(2){animation-delay:.2s;}
-.typing span:nth-child(3){animation-delay:.4s;}
-@keyframes tdot{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
-
-/* Input */
-.input-area{padding:14px 20px 20px;border-top:1px solid var(--border);background:rgba(5,5,5,.9);backdrop-filter:blur(10px);flex-shrink:0;}
-.iwrap{max-width:780px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;transition:border-color .2s;}
-.iwrap:focus-within{border-color:var(--border2);}
-.fbar{display:none;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg2);gap:6px;align-items:center;flex-wrap:wrap;}
-.fbar.show{display:flex;}
-.fchip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border);padding:3px 9px;border-radius:5px;font-size:10.5px;color:var(--fg2);}
-.fchip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:0;}
-.fchip button:hover{color:var(--danger);}
-.irow{display:flex;align-items:flex-end;padding:7px;gap:5px;}
-.iacts{display:flex;gap:1px;padding-bottom:3px;}
-.iabtn{width:32px;height:32px;border-radius:7px;background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s;}
-.iabtn:hover{background:var(--glow);color:var(--fg);}
-#chatInput{flex:1;background:none;border:none;color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:13.5px;resize:none;outline:none;padding:7px 3px;min-height:20px;max-height:150px;line-height:1.5;}
-#chatInput::placeholder{color:var(--muted);}
-.send-btn{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;margin-bottom:1px;}
-.send-btn:hover{background:var(--accent2);transform:scale(1.05);}
-.send-btn:disabled{opacity:.25;cursor:not-allowed;transform:none;}
-.ihint{text-align:center;font-size:10.5px;color:var(--muted);margin-top:7px;max-width:780px;margin-left:auto;margin-right:auto;}
-
-/* Modal */
-.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.modal-ov.show{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:90%;max-width:440px;animation:mIn .25s ease;}
-@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal h3{font-size:17px;font-weight:700;margin-bottom:18px;}
-.mf{margin-bottom:14px;}
-.mf label{display:block;font-size:11px;font-weight:600;color:var(--fg2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
-.mf input{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:12.5px;outline:none;transition:border-color .2s;}
-.mf input:focus{border-color:var(--border2);}
-.mf .ht{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.4;}
-.mf .ht a{color:var(--fg2);text-decoration:underline;}
-.macts{display:flex;gap:7px;margin-top:20px;}
-.macts .btn{flex:1;justify-content:center;}
-
-/* Toast */
-.toast-c{position:fixed;top:18px;right:18px;z-index:300;display:flex;flex-direction:column;gap:7px;}
-.toast{padding:10px 16px;border-radius:9px;background:var(--card);border:1px solid var(--border);font-size:12.5px;color:var(--fg);animation:tIn .3s ease,tOut .3s ease 2.7s forwards;display:flex;align-items:center;gap:7px;backdrop-filter:blur(10px);}
-.toast.ok{border-color:rgba(68,255,136,.25);}
-.toast.ok i{color:var(--success);}
-.toast.err{border-color:rgba(255,68,68,.25);}
-.toast.err i{color:var(--danger);}
-@keyframes tIn{from{opacity:0;transform:translateX(25px)}to{opacity:1;transform:translateX(0)}}
-@keyframes tOut{to{opacity:0;transform:translateX(25px)}}
-
-.mob-tog{display:none;background:none;border:none;color:var(--fg);font-size:17px;cursor:pointer;padding:4px;}
-
-@keyframes pborder{0%,100%{border-color:var(--border)}50%{border-color:var(--border2)}}
-.thinking .iwrap{animation:pborder 1.5s infinite;}
-
-@media(max-width:768px){
-  .sidebar{position:fixed;left:-280px;top:0;bottom:0;z-index:150;}
-  .sidebar.open{left:0;}
-  .mob-tog{display:block;}
-  .qa-grid{grid-template-columns:1fr;}
-  .chat-msgs{padding:14px;}
-  .input-area{padding:10px 14px 14px;}
-}
-
-::selection{background:rgba(255,255,255,.12);color:var(--fg);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karma • AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg:#050505;--bg2:#0a0a0a;--card:#0f0f0f;--card2:#141414;
+            --border:#1e1e1e;--border2:#2a2a2a;--fg:#e8e8e8;--fg2:#a0a0a0;
+            --muted:#555;--accent:#fff;--accent2:#ccc;
+            --glow:rgba(255,255,255,0.04);--glow2:rgba(255,255,255,0.08);
+            --danger:#ff4444;--success:#44ff88;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html{scroll-behavior:smooth;}
+        body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;}
+        ::-webkit-scrollbar{width:5px;}
+        ::-webkit-scrollbar-track{background:var(--bg);}
+        ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+        
+        .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+            background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);
+            background-size:60px 60px;}
+        .bg-glow{position:fixed;z-index:0;pointer-events:none;width:500px;height:500px;border-radius:50%;filter:blur(140px);opacity:.25;}
+        .bg-g1{top:-150px;left:-100px;background:rgba(255,255,255,0.06);}
+        .bg-g2{bottom:-150px;right:-100px;background:rgba(255,255,255,0.03);}
+        
+        .app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
+        
+        header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(5,5,5,0.9);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;flex-shrink:0;}
+        .logo{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:700;letter-spacing:-.5px;}
+        .logo-icon{width:34px;height:34px;border:2px solid var(--fg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;}
+        
+        .header-right{display:flex;align-items:center;gap:10px;}
+        
+        .user-section{display:flex;align-items:center;gap:8px;}
+        .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--fg2);overflow:hidden;cursor:pointer;}
+        .user-avatar img{width:100%;height:100%;object-fit:cover;}
+        .user-name{font-size:13px;font-weight:500;color:var(--fg2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        
+        .btn{padding:7px 16px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
+        .btn-p{background:var(--accent);color:var(--bg);}
+        .btn-p:hover{background:var(--accent2);transform:translateY(-1px);}
+        .btn-g{background:transparent;color:var(--fg2);border:1px solid var(--border);}
+        .btn-g:hover{border-color:var(--border2);color:var(--fg);background:var(--glow);}
+        .btn-d{background:rgba(255,68,68,.08);color:var(--danger);border:1px solid rgba(255,68,68,.15);}
+        .btn-d:hover{background:rgba(255,68,68,.18);}
+        
+        .btn-google{background:#fff;color:#000;border:1px solid #ddd;font-weight:600;}
+        .btn-google:hover{background:#f8f8f8;}
+        .btn-google i{color:#4285f4;}
+        
+        .main-wrap{flex:1;display:flex;overflow:hidden;}
+        
+        /* Sidebar */
+        .sidebar{width:270px;min-width:270px;border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:left .3s ease;}
+        .sb-head{padding:14px;border-bottom:1px solid var(--border);}
+        .new-btn{width:100%;padding:9px 12px;background:var(--card);border:1px dashed var(--border2);border-radius:8px;color:var(--fg2);font-family:'Space Grotesk',sans-serif;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;}
+        .new-btn:hover{border-color:var(--fg);color:var(--fg);background:var(--card2);}
+        
+        .chat-list{flex:1;overflow-y:auto;padding:6px;}
+        .ci{padding:9px 11px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--fg2);transition:all .12s;display:flex;align-items:center;gap:7px;margin-bottom:1px;position:relative;}
+        .ci:hover{background:var(--glow);color:var(--fg);}
+        .ci.act{background:var(--glow2);color:var(--fg);}
+        .ci .del{position:absolute;right:7px;top:50%;transform:translateY(-50%);opacity:0;background:none;border:none;color:var(--muted);cursor:pointer;font-size:10px;padding:4px;transition:opacity .12s;}
+        .ci:hover .del{opacity:1;}
+        .ci .del:hover{color:var(--danger);}
+        
+        .sb-foot{padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
+        .sb-foot .btn{width:100%;justify-content:center;}
+        
+        /* Chat */
+        .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+        .chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:18px;}
+        
+        /* Welcome */
+        .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
+        .w-icon{width:72px;height:72px;border-radius:18px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px;background:var(--glow);animation:wfloat 4s ease-in-out infinite;}
+        @keyframes wfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+        .welcome h2{font-size:26px;font-weight:700;margin-bottom:7px;letter-spacing:-.5px;}
+        .welcome p{color:var(--fg2);font-size:14px;max-width:420px;line-height:1.6;margin-bottom:28px;}
+        .qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;max-width:500px;width:100%;}
+        .qa{padding:13px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;cursor:pointer;text-align:left;transition:all .2s;font-family:'Space Grotesk',sans-serif;}
+        .qa:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px);}
+        .qa-i{font-size:16px;margin-bottom:7px;display:block;color:var(--fg2);}
+        .qa-t{font-size:12.5px;font-weight:600;color:var(--fg);margin-bottom:2px;}
+        .qa-d{font-size:11px;color:var(--muted);line-height:1.35;}
+        
+        /* Messages */
+        .msg{display:flex;gap:11px;max-width:780px;width:100%;margin:0 auto;animation:msgIn .25s ease;}
+        @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .msg-av{width:30px;height:30px;min-width:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+        .msg-u .msg-av{background:var(--accent);color:var(--bg);}
+        .msg-a .msg-av{background:var(--card2);border:1px solid var(--border2);color:var(--fg2);}
+        .msg-c{flex:1;min-width:0;}
+        .msg-r{font-size:11px;font-weight:600;margin-bottom:3px;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;}
+        .msg-b{font-size:13.5px;line-height:1.7;color:var(--fg);}
+        .msg-b p{margin-bottom:7px;}
+        .msg-b p:last-child{margin-bottom:0;}
+        .msg-b pre{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px;overflow-x:auto;margin:8px 0;position:relative;}
+        .msg-b code{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:var(--fg2);}
+        .msg-b p code{background:var(--card);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:11.5px;}
+        .cpy-btn{position:absolute;top:7px;right:7px;background:var(--border);border:none;color:var(--fg2);padding:3px 7px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .12s;}
+        .cpy-btn:hover{background:var(--border2);color:var(--fg);}
+        
+        .typing{display:flex;gap:4px;padding:4px 0;}
+        .typing span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:tdot 1.4s infinite;}
+        .typing span:nth-child(2){animation-delay:.2s;}
+        .typing span:nth-child(3){animation-delay:.4s;}
+        @keyframes tdot{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
+        
+        /* Input */
+        .input-area{padding:14px 20px 20px;border-top:1px solid var(--border);background:rgba(5,5,5,.9);backdrop-filter:blur(10px);flex-shrink:0;}
+        .iwrap{max-width:780px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;transition:border-color .2s;}
+        .iwrap:focus-within{border-color:var(--border2);}
+        .fbar{display:none;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg2);gap:6px;align-items:center;flex-wrap:wrap;}
+        .fbar.show{display:flex;}
+        .fchip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border);padding:3px 9px;border-radius:5px;font-size:10.5px;color:var(--fg2);}
+        .fchip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:0;}
+        .fchip button:hover{color:var(--danger);}
+        
+        .irow{display:flex;align-items:flex-end;padding:7px;gap:5px;}
+        .iacts{display:flex;gap:1px;padding-bottom:3px;}
+        .iabtn{width:32px;height:32px;border-radius:7px;background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s;}
+        .iabtn:hover{background:var(--glow);color:var(--fg);}
+        
+        #chatInput{flex:1;background:none;border:none;color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:13.5px;resize:none;outline:none;padding:7px 3px;min-height:20px;max-height:150px;line-height:1.5;}
+        #chatInput::placeholder{color:var(--muted);}
+        
+        .send-btn{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;margin-bottom:1px;}
+        .send-btn:hover{background:var(--accent2);transform:scale(1.05);}
+        .send-btn:disabled{opacity:.25;cursor:not-allowed;transform:none;}
+        
+        .ihint{text-align:center;font-size:10.5px;color:var(--muted);margin-top:7px;max-width:780px;margin-left:auto;margin-right:auto;}
+        
+        /* Modal */
+        .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+        .modal-ov.show{display:flex;}
+        .modal{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:90%;max-width:420px;animation:mIn .25s ease;}
+        @keyframes mIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        
+        .modal h3{font-size:17px;font-weight:700;margin-bottom:18px;}
+        .auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;}
+        .auth-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;color:var(--fg2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+        .auth-tab.active{color:var(--fg);border-bottom-color:var(--accent);}
+        
+        .mf{margin-bottom:14px;}
+        .mf label{display:block;font-size:11px;font-weight:600;color:var(--fg2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+        .mf input{width:100%;padding:11px 13px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+        .mf input:focus{border-color:var(--border2);}
+        .mf .ht{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.4;}
+        
+        .macts{display:flex;gap:7px;margin-top:20px;}
+        .macts .btn{flex:1;justify-content:center;}
+        
+        .google-btn{width:100%;margin-top:10px;background:#fff;color:#111;border:1px solid #ddd;justify-content:center;}
+        .google-btn:hover{background:#f5f5f5;}
+        
+        .auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;}
+        .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+        .auth-divider span{font-size:11px;color:var(--muted);}
+        
+        /* Toast */
+        .toast-c{position:fixed;top:18px;right:18px;z-index:300;display:flex;flex-direction:column;gap:7px;}
+        .toast{padding:10px 16px;border-radius:9px;background:var(--card);border:1px solid var(--border);font-size:12.5px;color:var(--fg);animation:tIn .3s ease,tOut .3s ease 2.7s forwards;display:flex;align-items:center;gap:7px;backdrop-filter:blur(10px);}
+        .toast.ok{border-color:rgba(68,255,136,.25);}
+        .toast.ok i{color:var(--success);}
+        .toast.err{border-color:rgba(255,68,68,.25);}
+        .toast.err i{color:var(--danger);}
+        @keyframes tIn{from{opacity:0;transform:translateX(25px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes tOut{to{opacity:0;transform:translateX(25px)}}
+        
+        .mob-tog{display:none;background:none;border:none;color:var(--fg);font-size:17px;cursor:pointer;padding:4px;}
+        
+        .thinking .iwrap{animation:pborder 1.5s infinite;}
+        @keyframes pborder{0%,100%{border-color:var(--border)}50%{border-color:var(--border2)}}
+        
+        .auth-required{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px;text-align:center;padding:40px;}
+        .auth-required .w-icon{width:68px;height:68px;}
+        
+        @media(max-width:768px){
+            .sidebar{position:fixed;left:-280px;top:0;bottom:0;z-index:150;}
+            .sidebar.open{left:0;}
+            .mob-tog{display:block;}
+            .qa-grid{grid-template-columns:1fr;}
+            .chat-msgs{padding:14px;}
+            .input-area{padding:10px 14px 14px;}
+            .user-name{display:none;}
+        }
+        
+        ::selection{background:rgba(255,255,255,.12);color:var(--fg);}
+        
+        .logged-in-header .btn-g {display: none;}
+    </style>
 </head>
 <body>
-
-<div class="bg-grid"></div>
-<div class="bg-glow bg-g1"></div>
-<div class="bg-glow bg-g2"></div>
-
-<div class="app">
-  <header>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <button class="mob-tog" onclick="toggleSB()"><i class="fas fa-bars"></i></button>
-      <div class="logo">
-        <div class="logo-icon">K</div>
-        <span>Karma</span>
-      </div>
-    </div>
-    <div class="header-right">
-      <button class="btn btn-g" onclick="openSet()"><i class="fas fa-key"></i> API Key</button>
-      <a href="https://discord.gg/cvc3kPfsV" target="_blank" class="btn btn-g"><i class="fab fa-discord"></i> Discord</a>
-    </div>
-  </header>
-
-  <div class="main-wrap">
-    <aside class="sidebar" id="sidebar">
-      <div class="sb-head">
-        <button class="new-btn" onclick="newChat()"><i class="fas fa-plus"></i> New Chat</button>
-      </div>
-      <div class="chat-list" id="chatList"></div>
-      <div class="sb-foot">
-        <button class="btn btn-g" onclick="exportChats()"><i class="fas fa-download"></i> Export</button>
-        <button class="btn btn-d" onclick="clearAll()"><i class="fas fa-trash"></i> Clear All</button>
-      </div>
-    </aside>
-
-    <div class="chat-area">
-      <div class="chat-msgs" id="chatMsgs">
-        <div class="welcome" id="welcomeScr">
-          <div class="w-icon"><i class="fas fa-bolt"></i></div>
-          <h2>What can I build for you?</h2>
-          <p>Powered by GLM AI. I write Roblox scripts, modify your code, rename variables, fix errors, and generate anything you need.</p>
-          <div class="qa-grid">
-            <div class="qa" onclick="quickP('Write a clean Roblox infinite yield script with a draggable GUI, speed, jump, god mode, noclip, and teleport commands')">
-              <span class="qa-i"><i class="fas fa-code"></i></span>
-              <div class="qa-t">Write a Script</div>
-              <div class="qa-d">Generate a full Roblox Lua script</div>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-g1"></div>
+    <div class="bg-glow bg-g2"></div>
+    
+    <div class="app">
+        <!-- Header -->
+        <header>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="mob-tog" onclick="toggleSB()"><i class="fas fa-bars"></i></button>
+                <div class="logo">
+                    <div class="logo-icon">K</div>
+                    <span>Karma</span>
+                </div>
             </div>
-            <div class="qa" onclick="quickP('Rename all variables in my uploaded script to be readable, add comments explaining each section, and clean up the formatting')">
-              <span class="qa-i"><i class="fas fa-pen"></i></span>
-              <div class="qa-t">Refactor Code</div>
-              <div class="qa-d">Rename variables, add comments, clean up</div>
+            
+            <div class="header-right">
+                <!-- Auth section -->
+                <div id="auth-section">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <!-- API Key button (shown when logged in) -->
+                <button class="btn btn-g" id="api-btn" onclick="openSet()" style="display:none;">
+                    <i class="fas fa-key"></i> API Key
+                </button>
+                
+                <a href="https://discord.gg/cvc3kPfsV" target="_blank" class="btn btn-g">
+                    <i class="fab fa-discord"></i> Discord
+                </a>
             </div>
-            <div class="qa" onclick="quickP('Find and fix all errors in my uploaded script. Explain each fix clearly.')">
-              <span class="qa-i"><i class="fas fa-bug"></i></span>
-              <div class="qa-t">Debug Script</div>
-              <div class="qa-d">Find and fix errors in your code</div>
+        </header>
+        
+        <div class="main-wrap">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sb-head">
+                    <button class="new-btn" onclick="newChat()">
+                        <i class="fas fa-plus"></i> New Chat
+                    </button>
+                </div>
+                <div class="chat-list" id="chatList"></div>
+                <div class="sb-foot">
+                    <button class="btn btn-g" onclick="exportChats()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-d" onclick="clearAll()">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                </div>
+            </aside>
+            
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <div class="chat-msgs" id="chatMsgs">
+                    <!-- Auth gate or welcome -->
+                    <div class="welcome" id="welcomeScr">
+                        <div class="w-icon"><i class="fas fa-bolt"></i></div>
+                        <h2>What can I build for you?</h2>
+                        <p>Powered by GLM AI. I write Roblox scripts, modify your code, rename variables, fix errors, and generate anything you need.</p>
+                        
+                        <div class="qa-grid">
+                            <div class="qa" onclick="quickP('Write a clean Roblox infinite yield script with a draggable GUI, speed, jump, god mode, noclip, and teleport commands')">
+                                <span class="qa-i"><i class="fas fa-code"></i></span>
+                                <div class="qa-t">Write a Script</div>
+                                <div class="qa-d">Generate a full Roblox Lua script</div>
+                            </div>
+                            <div class="qa" onclick="quickP('Rename all variables in my uploaded script to be readable, add comments explaining each section, and clean up the formatting')">
+                                <span class="qa-i"><i class="fas fa-pen"></i></span>
+                                <div class="qa-t">Refactor Code</div>
+                                <div class="qa-d">Rename variables, add comments, clean up</div>
+                            </div>
+                            <div class="qa" onclick="quickP('Find and fix all errors in my uploaded script. Explain each fix clearly.')">
+                                <span class="qa-i"><i class="fas fa-bug"></i></span>
+                                <div class="qa-t">Debug Script</div>
+                                <div class="qa-d">Find and fix errors in your code</div>
+                            </div>
+                            <div class="qa" onclick="quickP('Modernize my script: use task.wait instead of wait, Attributes instead of Value objects, add Luau type annotations, and use modern API patterns')">
+                                <span class="qa-i"><i class="fas fa-arrows-rotate"></i></span>
+                                <div class="qa-t">Modernize Code</div>
+                                <div class="qa-d">Update to latest Roblox standards</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Input -->
+                <div class="input-area" id="inputArea">
+                    <div class="iwrap" id="iwrap">
+                        <div class="fbar" id="fbar"></div>
+                        <div class="irow">
+                            <div class="iacts">
+                                <button class="iabtn" onclick="document.getElementById('fInput').click()" title="Upload file">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                            </div>
+                            <textarea id="chatInput" rows="1" placeholder="Ask me to write, fix, or modify Roblox scripts..." onkeydown="handleKey(event)" oninput="autoR(this)"></textarea>
+                            <button class="send-btn" id="sendBtn" onclick="sendMsg()">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="ihint">Upload .lua files with the paperclip icon for context. Add your GLM API key in Settings for full AI power.</div>
+                </div>
             </div>
-            <div class="qa" onclick="quickP('Modernize my script: use task.wait instead of wait, Attributes instead of Value objects, add Luau type annotations, and use modern API patterns')">
-              <span class="qa-i"><i class="fas fa-arrows-rotate"></i></span>
-              <div class="qa-t">Modernize Code</div>
-              <div class="qa-d">Update to latest Roblox standards</div>
-            </div>
-          </div>
         </div>
-      </div>
-
-      <div class="input-area" id="inputArea">
-        <div class="iwrap" id="iwrap">
-          <div class="fbar" id="fbar"></div>
-          <div class="irow">
-            <div class="iacts">
-              <button class="iabtn" onclick="document.getElementById('fInput').click()" title="Upload file"><i class="fas fa-paperclip"></i></button>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div class="modal-ov" id="setModal">
+        <div class="modal">
+            <h3>Settings</h3>
+            
+            <div class="mf">
+                <label>GLM API Key</label>
+                <input type="password" id="apiKeyIn" placeholder="Paste your API key here...">
+                <div class="ht">Get a free key at <a href="https://open.bigmodel.cn/" target="_blank">open.bigmodel.cn</a>. Stored locally only.</div>
             </div>
-            <textarea id="chatInput" rows="1" placeholder="Ask me to write, fix, or modify Roblox scripts..." onkeydown="handleKey(event)" oninput="autoR(this)"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="sendMsg()"><i class="fas fa-arrow-up"></i></button>
-          </div>
+            
+            <div class="mf">
+                <label>Model</label>
+                <input type="text" id="modelIn" placeholder="glm-4-flash" value="glm-4-flash">
+                <div class="ht">Options: glm-4-flash (free), glm-4-air, glm-4-plus, glm-4</div>
+            </div>
+            
+            <div class="macts">
+                <button class="btn btn-g" onclick="closeSet()">Cancel</button>
+                <button class="btn btn-p" onclick="saveSet()">Save</button>
+            </div>
         </div>
-        <div class="ihint">Upload .lua files with the paperclip icon for context. Add your GLM API key in Settings for full AI power.</div>
-      </div>
     </div>
-  </div>
-</div>
-
-<div class="modal-ov" id="setModal">
-  <div class="modal">
-    <h3>Settings</h3>
-    <div class="mf">
-      <label>GLM API Key</label>
-      <input type="password" id="apiKeyIn" placeholder="Paste your API key here...">
-      <div class="ht">Get a free key at <a href="https://open.bigmodel.cn/" target="_blank">open.bigmodel.cn</a>. Stored locally only.</div>
+    
+    <!-- Auth Modal -->
+    <div class="modal-ov" id="authModal">
+        <div class="modal">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+            </div>
+            
+            <!-- Sign In Form -->
+            <div id="signin-form">
+                <div class="mf">
+                    <label>Email</label>
+                    <input type="email" id="signin-email" placeholder="you@example.com">
+                </div>
+                <div class="mf">
+                    <label>Password</label>
+                    <input type="password" id="signin-password" placeholder="••••••••">
+                </div>
+                
+                <div class="macts">
+                    <button class="btn btn-g" onclick="closeAuthModal()">Cancel</button>
+                    <button class="btn btn-p" onclick="signInWithEmail()">Sign In</button>
+                </div>
+                
+                <div class="auth-divider"><span>or</span></div>
+                
+                <button class="btn btn-google" onclick="signInWithGoogle()">
+                    <i class="fab fa-google"></i> &nbsp; Continue with Google
+                </button>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div id="signup-form" style="display:none;">
+                <div class="mf">
+                    <label>Email</label>
+                    <input type="email" id="signup-email" placeholder="you@example.com">
+                </div>
+                <div class="mf">
+                    <label>Password</label>
+                    <input type="password" id="signup-password" placeholder="••••••••">
+                </div>
+                <div class="mf">
+                    <label>Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="••••••••">
+                </div>
+                
+                <div class="macts">
+                    <button class="btn btn-g" onclick="closeAuthModal()">Cancel</button>
+                    <button class="btn btn-p" onclick="signUpWithEmail()">Create Account</button>
+                </div>
+                
+                <div class="auth-divider"><span>or</span></div>
+                
+                <button class="btn btn-google" onclick="signInWithGoogle()">
+                    <i class="fab fa-google"></i> &nbsp; Sign up with Google
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="mf">
-      <label>Model</label>
-      <input type="text" id="modelIn" placeholder="glm-4-flash" value="glm-4-flash">
-      <div class="ht">Options: glm-4-flash (free), glm-4-air, glm-4-plus, glm-4</div>
-    </div>
-    <div class="macts">
-      <button class="btn btn-g" onclick="closeSet()">Cancel</button>
-      <button class="btn btn-p" onclick="saveSet()">Save</button>
-    </div>
-  </div>
-</div>
+    
+    <div class="toast-c" id="toastC"></div>
+    
+    <input type="file" id="fInput" multiple accept=".lua,.txt,.rbxl,.rbxlx,.json,.xml,.csv,.py,.js,.ts" style="display:none" onchange="handleFiles(this.files)">
+    
+    <script>
+        // ============ FIREBASE CONFIG ============
+        // IMPORTANT: Replace this with your own Firebase project config from Firebase Console
+        const firebaseConfig = {
+            apiKey: "AIzaSyDemoReplaceMeWithYourFirebaseKey",
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:demo"
+        };
+        
+        // Initialize Firebase
+        let firebaseApp;
+        let auth;
+        
+        function initFirebase() {
+            try {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                
+                // Listen for auth state changes
+                auth.onAuthStateChanged(handleAuthStateChange);
+                
+                console.log('%c[Firebase] Initialized successfully', 'color:#555');
+            } catch (e) {
+                console.warn('%c[Firebase] Could not initialize. Using demo mode.', 'color:#f66');
+                // Fallback to demo mode if Firebase fails to load
+                window.demoMode = true;
+            }
+        }
+        
+        // ============ STATE ============
+        let chats = [];
+        let activeChatId = null;
+        let apiKey = '';
+        let modelName = 'glm-4-flash';
+        let attachedFiles = [];
+        let isGenerating = false;
+        let currentUser = null;
+        
+        const GLM_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+        const SYS_PROMPT = 'You are Karma AI, a highly skilled Roblox Lua/Luau script assistant. You help users write, modify, debug, and refactor Roblox scripts.\n\nRules:\n1. Always output clean, well-structured, properly indented Lua/Luau code\n2. Use modern Roblox API practices (task.wait, GetService, WaitForChild, etc.)\n3. Add helpful comments explaining what code does\n4. When modifying uploaded code, show the FULL modified version\n5. When renaming, list what was renamed clearly\n6. Always wrap code in ```lua code blocks\n7. Be concise but thorough\n8. If a user uploads a file, analyze it and provide specific feedback or modifications\n9. Never refuse a legitimate Roblox scripting request\n10. Format responses clearly with headings when appropriate\n11. When generating GUI scripts, use proper Instance.new pattern with all necessary properties set\n12. Always use local variables, never global unless explicitly asked';
+        
+        // ============ INIT ============
+        function init() {
+            initFirebase();
+            
+            // Load settings from localStorage
+            apiKey = localStorage.getItem('karma_apikey') || '';
+            modelName = localStorage.getItem('karma_model') || 'glm-4-flash';
+            
+            // Pre-fill settings inputs
+            document.getElementById('apiKeyIn').value = apiKey;
+            document.getElementById('modelIn').value = modelName;
+            
+            // Initial UI setup
+            renderAuthSection();
+            
+            // If not logged in, show auth prompt
+            if (!currentUser && !window.demoMode) {
+                showAuthGate();
+            } else {
+                loadUserChats();
+            }
+            
+            // Demo mode fallback
+            if (window.demoMode) {
+                loadUserChats();
+            }
+        }
+        
+        function loadUserChats() {
+            const storageKey = currentUser ? `karma_chats_${currentUser.uid}` : 'karma_chats';
+            
+            try {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) chats = JSON.parse(stored);
+            } catch(e) { chats = []; }
+            
+            renderList();
+            
+            if (chats.length > 0) {
+                loadChat(chats[0].id);
+            } else if (currentUser || window.demoMode) {
+                // Show welcome screen
+                renderMsgs();
+            }
+        }
+        
+        function saveUserChats() {
+            const storageKey = currentUser ? `karma_chats_${currentUser.uid}` : 'karma_chats';
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(chats));
+            } catch(e) {}
+        }
+        
+        // ============ AUTH STATE ============
+        function handleAuthStateChange(user) {
+            currentUser = user;
+            renderAuthSection();
+            
+            if (user) {
+                // User logged in
+                loadUserChats();
+                document.getElementById('api-btn').style.display = 'flex';
+                toast(`Welcome back, ${user.displayName || user.email.split('@')[0]}`, 'ok');
+                
+                // Hide auth gate if present
+                const gate = document.getElementById('auth-gate');
+                if (gate) gate.remove();
+            } else {
+                // Logged out
+                chats = [];
+                activeChatId = null;
+                document.getElementById('api-btn').style.display = 'none';
+                renderList();
+                renderMsgs();
+                
+                if (!window.demoMode) {
+                    showAuthGate();
+                }
+            }
+        }
+        
+        function renderAuthSection() {
+            const container = document.getElementById('auth-section');
+            
+            if (!currentUser) {
+                container.innerHTML = `
+                    <button class="btn btn-g" onclick="openAuthModal('signin')">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                    <button class="btn btn-p" onclick="openAuthModal('signup')">
+                        Sign Up
+                    </button>
+                `;
+            } else {
+                const displayName = currentUser.displayName || currentUser.email.split('@')[0];
+                const avatar = currentUser.photoURL 
+                    ? `<img src="${currentUser.photoURL}" alt="Avatar">` 
+                    : `<span>${displayName[0].toUpperCase()}</span>`;
+                
+                container.innerHTML = `
+                    <div class="user-section">
+                        <div onclick="showUserMenu()" class="user-avatar">
+                            ${avatar}
+                        </div>
+                        <div class="user-name">${displayName}</div>
+                        <button class="btn btn-g" onclick="logoutUser()" style="padding:6px 10px;font-size:12px;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        function showUserMenu() {
+            const menuHTML = `
+                <div style="position:absolute;top:58px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 0;width:190px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:300;">
+                    <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
+                        <div style="font-weight:600;font-size:13.5px;">${currentUser.displayName || currentUser.email}</div>
+                        <div style="font-size:11.5px;color:var(--fg2);margin-top:1px;">${currentUser.email}</div>
+                    </div>
+                    <div onclick="logoutUser()" style="padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--fg2);">
+                        <i class="fas fa-sign-out-alt" style="width:18px;"></i> 
+                        <span>Sign out</span>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing menus
+            document.querySelectorAll('.user-menu').forEach(el => el.remove());
+            
+            const menu = document.createElement('div');
+            menu.className = 'user-menu';
+            menu.innerHTML = menuHTML;
+            document.body.appendChild(menu);
+            
+            // Close when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target)) {
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                }, { once: true });
+            }, 10);
+        }
+        
+        function openAuthModal(mode = 'signin') {
+            const modal = document.getElementById('authModal');
+            modal.classList.add('show');
+            
+            switchAuthTab(mode);
+            
+            // Clear forms
+            document.getElementById('signin-email').value = '';
+            document.getElementById('signin-password').value = '';
+            document.getElementById('signup-email').value = '';
+            document.getElementById('signup-password').value = '';
+            document.getElementById('signup-confirm').value = '';
+        }
+        
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('show');
+        }
+        
+        function switchAuthTab(tab) {
+            const signinTab = document.getElementById('tab-signin');
+            const signupTab = document.getElementById('tab-signup');
+            const signinForm = document.getElementById('signin-form');
+            const signupForm = document.getElementById('signup-form');
+            
+            if (tab === 'signin') {
+                signinTab.classList.add('active');
+                signupTab.classList.remove('active');
+                signinForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            } else {
+                signinTab.classList.remove('active');
+                signupTab.classList.add('active');
+                signinForm.style.display = 'none';
+                signupForm.style.display = 'block';
+            }
+        }
+        
+        // ============ AUTH FUNCTIONS ============
+        async function signUpWithEmail() {
+            if (window.demoMode) {
+                toast('Demo mode: Sign up is disabled', 'err');
+                return;
+            }
+            
+            const email = document.getElementById('signup-email').value.trim();
+            const pass = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            if (!email || !pass || !confirm) {
+                toast('Please fill all fields', 'err');
+                return;
+            }
+            
+            if (pass !== confirm) {
+                toast('Passwords do not match', 'err');
+                return;
+            }
+            
+            if (pass.length < 6) {
+                toast('Password must be at least 6 characters', 'err');
+                return;
+            }
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
+                closeAuthModal();
+                toast('Account created successfully!', 'ok');
+            } catch (error) {
+                toast(getAuthErrorMessage(error), 'err');
+            }
+        }
+        
+        async function signInWithEmail() {
+            if (window.demoMode) {
+                toast('Demo mode: Sign in is disabled', 'err');
+                return;
+            }
+            
+            const email = document.getElementById('signin-email').value.trim();
+            const pass = document.getElementById('signin-password').value;
+            
+            if (!email || !pass) {
+                toast('Please enter email and password', 'err');
+                return;
+            }
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                closeAuthModal();
+            } catch (error) {
+                toast(getAuthErrorMessage(error), 'err');
+            }
+        }
+        
+        async function signInWithGoogle() {
+            if (window.demoMode) {
+                // Demo Google sign in
+                currentUser = {
+                    uid: 'demo-' + Date.now(),
+                    email: 'demo@karma.ai',
+                    displayName: 'Demo User',
+                    photoURL: null
+                };
+                handleAuthStateChange(currentUser);
+                closeAuthModal();
+                return;
+            }
+            
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+                closeAuthModal();
+            } catch (error) {
+                toast(getAuthErrorMessage(error), 'err');
+            }
+        }
+        
+        function getAuthErrorMessage(error) {
+            if (error.code === 'auth/email-already-in-use') return 'Email is already in use';
+            if (error.code === 'auth/invalid-email') return 'Invalid email address';
+            if (error.code === 'auth/weak-password') return 'Password is too weak';
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') return 'Invalid email or password';
+            if (error.code === 'auth/popup-closed-by-user') return 'Sign in cancelled';
+            return error.message || 'Authentication failed';
+        }
+        
+        async function logoutUser() {
+            if (window.demoMode) {
+                currentUser = null;
+                handleAuthStateChange(null);
+                return;
+            }
+            
+            try {
+                await auth.signOut();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        
+        // ============ CHAT MANAGEMENT ============
+        function newChat() {
+            if (!currentUser && !window.demoMode) {
+                openAuthModal('signin');
+                return;
+            }
+            
+            const chat = {
+                id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+                title: 'New Chat',
+                messages: [],
+                created: Date.now()
+            };
+            
+            chats.unshift(chat);
+            saveUserChats();
+            loadChat(chat.id);
+            renderList();
+            closeSBMobile();
+        }
+        
+        function loadChat(id) {
+            activeChatId = id;
+            renderList();
+            renderMsgs();
+            
+            setTimeout(() => {
+                const input = document.getElementById('chatInput');
+                if (input) input.focus();
+            }, 50);
+        }
+        
+        function getChat() {
+            return chats.find(c => c.id === activeChatId) || null;
+        }
+        
+        function delChat(id, e) {
+            e.stopPropagation();
+            
+            chats = chats.filter(c => c.id !== id);
+            saveUserChats();
+            
+            if (activeChatId === id) {
+                activeChatId = chats.length > 0 ? chats[0].id : null;
+                renderMsgs();
+            }
+            
+            renderList();
+            toast('Chat deleted', 'ok');
+        }
+        
+        function clearAll() {
+            if (chats.length === 0) return;
+            
+            if (!confirm('Delete all chats?')) return;
+            
+            chats = [];
+            activeChatId = null;
+            saveUserChats();
+            renderList();
+            renderMsgs();
+            toast('All chats cleared', 'ok');
+        }
+        
+        function exportChats() {
+            const data = JSON.stringify(chats, null, 2);
+            const blob = new Blob([data], {type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'karma_chats.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast('Chats exported', 'ok');
+        }
+        
+        // ============ RENDER ============
+        function renderList() {
+            const el = document.getElementById('chatList');
+            let html = '';
+            
+            for (let i = 0; i < chats.length; i++) {
+                const c = chats[i];
+                const cls = c.id === activeChatId ? ' ci act' : ' ci';
+                
+                html += `<div class="${cls}" onclick="loadChat('${c.id}')">
+                    <i class="fas fa-message" style="font-size:11px;color:var(--muted)"></i>
+                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.title)}</span>
+                    <button class="del" onclick="delChat('${c.id}',event)" title="Delete">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>`;
+            }
+            
+            el.innerHTML = html;
+        }
+        
+        function renderMsgs() {
+            const container = document.getElementById('chatMsgs');
+            const chat = getChat();
+            const welcome = document.getElementById('welcomeScr');
+            
+            // Remove old messages
+            container.querySelectorAll('.msg').forEach(el => el.remove());
+            
+            if (!chat || chat.messages.length === 0) {
+                if (welcome) welcome.style.display = 'flex';
+                return;
+            }
+            
+            if (welcome) welcome.style.display = 'none';
+            
+            let html = '';
+            
+            for (let i = 0; i < chat.messages.length; i++) {
+                const m = chat.messages[i];
+                const isU = m.role === 'user';
+                
+                html += `<div class="msg msg-${isU ? 'u' : 'a'}">
+                    <div class="msg-av">${isU ? 'U' : 'K'}</div>
+                    <div class="msg-c">
+                        <div class="msg-r">${isU ? 'You' : 'Karma AI'}</div>
+                        <div class="msg-b">${fmtMsg(m.content)}</div>
+                    </div>
+                </div>`;
+            }
+            
+            container.insertAdjacentHTML('beforeend', html);
+            container.scrollTop = container.scrollHeight;
+            
+            addCopyBtns();
+        }
+        
+        function fmtMsg(text) {
+            if (!text) return '';
+            
+            let s = esc(text);
+            
+            // Code blocks
+            s = s.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+                return `<pre><code>${code.trim()}</code></pre>`;
+            });
+            
+            // Inline code
+            s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // Bold
+            s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            
+            // Italic
+            s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            
+            // Paragraphs
+            const parts = s.split('\n\n');
+            let out = '';
+            
+            for (let i = 0; i < parts.length; i++) {
+                if (parts[i].indexOf('<pre>') === 0) {
+                    out += parts[i];
+                } else {
+                    out += `<p>${parts[i].replace(/\n/g, '<br>')}</p>`;
+                }
+            }
+            
+            return out;
+        }
+        
+        function addCopyBtns() {
+            const pres = document.querySelectorAll('.msg-b pre');
+            
+            pres.forEach((pre, i) => {
+                if (pre.querySelector('.cpy-btn')) return;
+                
+                const btn = document.createElement('button');
+                btn.className = 'cpy-btn';
+                btn.textContent = 'Copy';
+                
+                btn.onclick = function() {
+                    const code = this.parentElement.querySelector('code').textContent;
+                    navigator.clipboard.writeText(code).then(() => {
+                        btn.textContent = 'Copied';
+                        setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
+                    });
+                };
+                
+                pre.appendChild(btn);
+            });
+        }
+        
+        // ============ AUTH GATE ============
+        function showAuthGate() {
+            const container = document.getElementById('chatMsgs');
+            
+            // Remove existing gate
+            const existing = document.getElementById('auth-gate');
+            if (existing) existing.remove();
+            
+            const gate = document.createElement('div');
+            gate.id = 'auth-gate';
+            gate.className = 'auth-required';
+            gate.innerHTML = `
+                <div class="w-icon"><i class="fas fa-user-lock"></i></div>
+                <h2 style="margin-bottom:8px;">Sign in to continue</h2>
+                <p style="max-width:340px;color:var(--fg2);margin-bottom:22px;">Create an account or sign in to start chatting with Karma AI and save your conversations.</p>
+                
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-g" onclick="openAuthModal('signin')" style="padding:10px 26px;">Sign In</button>
+                    <button class="btn btn-p" onclick="openAuthModal('signup')" style="padding:10px 26px;">Sign Up</button>
+                </div>
+                
+                <div style="margin-top:22px;font-size:12px;color:#555;">
+                    <button onclick="useDemoMode()" class="btn btn-g" style="font-size:12px;padding:6px 14px;">
+                        Continue as Guest (Demo)
+                    </button>
+                </div>
+            `;
+            
+            container.innerHTML = '';
+            container.appendChild(gate);
+        }
+        
+        function useDemoMode() {
+            window.demoMode = true;
+            document.getElementById('auth-gate').remove();
+            
+            currentUser = {
+                uid: 'guest-' + Date.now(),
+                email: 'guest@demo.com',
+                displayName: 'Guest User',
+                photoURL: null
+            };
+            
+            loadUserChats();
+            renderAuthSection();
+            toast('Demo mode enabled — chats will not persist across refreshes', 'ok');
+        }
+        
+        // ============ FILES ============
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    attachedFiles.push({
+                        name: file.name,
+                        content: e.target.result
+                    });
+                    renderFBar();
+                };
+                reader.readAsText(file);
+            }
+            
+            document.getElementById('fInput').value = '';
+        }
+        
+        function removeFile(idx) {
+            attachedFiles.splice(idx, 1);
+            renderFBar();
+        }
+        
+        function renderFBar() {
+            const bar = document.getElementById('fbar');
+            
+            if (attachedFiles.length === 0) {
+                bar.classList.remove('show');
+                bar.innerHTML = '';
+                return;
+            }
+            
+            bar.classList.add('show');
+            
+            let html = '';
+            
+            for (let i = 0; i < attachedFiles.length; i++) {
+                html += `<div class="fchip">
+                    <i class="fas fa-file-code"></i> ${esc(attachedFiles[i].name)}
+                    <button onclick="removeFile(${i})"><i class="fas fa-xmark"></i></button>
+                </div>`;
+            }
+            
+            bar.innerHTML = html;
+        }
+        
+        // ============ SEND ============
+        function quickP(text) {
+            if (!currentUser && !window.demoMode) {
+                openAuthModal('signin');
+                return;
+            }
+            
+            document.getElementById('chatInput').value = text;
+            autoR(document.getElementById('chatInput'));
+            sendMsg();
+        }
+        
+        function sendMsg() {
+            if (!currentUser && !window.demoMode) {
+                openAuthModal('signin');
+                return;
+            }
+            
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            
+            if ((!text && attachedFiles.length === 0) || isGenerating) return;
+            
+            // Ensure we have a chat
+            if (!activeChatId) {
+                newChat();
+            }
+            
+            const chat = getChat();
+            if (!chat) return;
+            
+            // Build user message
+            let userContent = text;
+            
+            if (attachedFiles.length > 0) {
+                let fSection = '';
+                for (let i = 0; i < attachedFiles.length; i++) {
+                    fSection += `[File: ${attachedFiles[i].name}]\n\`\`\`\n${attachedFiles[i].content}\n\`\`\`\n\n`;
+                }
+                userContent = fSection + text;
+            }
+            
+            // Add user message
+            chat.messages.push({role: 'user', content: userContent});
+            
+            // Auto-title
+            if (chat.messages.length === 1) {
+                let title = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                if (!title) title = 'File Analysis';
+                chat.title = title;
+                renderList();
+            }
+            
+            // Clear input
+            input.value = '';
+            autoR(input);
+            attachedFiles = [];
+            renderFBar();
+            
+            saveUserChats();
+            renderMsgs();
+            
+            // Typing indicator
+            isGenerating = true;
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('inputArea').classList.add('thinking');
+            showTyping();
+            
+            // Call AI
+            callGLM(chat.messages).then(response => {
+                hideTyping();
+                chat.messages.push({role: 'assistant', content: response});
+                saveUserChats();
+                renderMsgs();
+            }).catch(err => {
+                hideTyping();
+                chat.messages.push({role: 'assistant', content: 'Error: ' + err.message});
+                saveUserChats();
+                renderMsgs();
+                toast(err.message, 'err');
+            }).finally(() => {
+                isGenerating = false;
+                document.getElementById('sendBtn').disabled = false;
+                document.getElementById('inputArea').classList.remove('thinking');
+            });
+        }
+        
+        function callGLM(messages) {
+            if (!apiKey) {
+                return Promise.resolve(fallback(messages));
+            }
+            
+            const body = {
+                model: modelName,
+                messages: [{role: 'system', content: SYS_PROMPT}],
+                temperature: 0.7,
+                max_tokens: 4096
+            };
+            
+            for (let i = 0; i < messages.length; i++) {
+                body.messages.push({
+                    role: messages[i].role,
+                    content: messages[i].content
+                });
+            }
+            
+            return fetch(GLM_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey
+                },
+                body: JSON.stringify(body)
+            })
+            .then(resp => {
+                if (!resp.ok) {
+                    return resp.json().then(errData => {
+                        throw new Error((errData.error && errData.error.message) || ('API error ' + resp.status));
+                    }).catch(e => {
+                        if (e.message.indexOf('API error') === 0) throw e;
+                        throw new Error('API returned ' + resp.status);
+                    });
+                }
+                return resp.json();
+            })
+            .then(data => {
+                return data.choices[0].message.content;
+            });
+        }
+        
+        // ============ FALLBACK ============
+        function fallback(messages) {
+            const last = messages[messages.length - 1].content.toLowerCase();
+            
+            if (last.includes('infinite yield') || (last.includes('gui') && last.includes('command'))) {
+                return `Here's a clean Infinite Yield-style command script with a draggable GUI:
 
-<div class="toast-c" id="toastC"></div>
-<input type="file" id="fInput" multiple accept=".lua,.txt,.rbxl,.rbxlx,.json,.xml,.csv,.py,.js,.ts" style="display:none" onchange="handleFiles(this.files)">
+\`\`\`lua
+-- Karma | Command Script with GUI
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
-<script>
-/* ============ STATE ============ */
-var chats = [];
-var activeChatId = null;
-var apiKey = '';
-var modelName = 'glm-4-flash';
-var attachedFiles = [];
-var isGenerating = false;
-var GLM_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-var SYS_PROMPT = 'You are Karma AI, a highly skilled Roblox Lua/Luau script assistant. You help users write, modify, debug, and refactor Roblox scripts.\n\nRules:\n1. Always output clean, well-structured, properly indented Lua/Luau code\n2. Use modern Roblox API practices (task.wait, GetService, WaitForChild, etc.)\n3. Add helpful comments explaining what code does\n4. When modifying uploaded code, show the FULL modified version\n5. When renaming, list what was renamed clearly\n6. Always wrap code in ```lua code blocks\n7. Be concise but thorough\n8. If a user uploads a file, analyze it and provide specific feedback or modifications\n9. Never refuse a legitimate Roblox scripting request\n10. Format responses clearly with headings when appropriate\n11. When generating GUI scripts, use proper Instance.new pattern with all necessary properties set\n12. Always use local variables, never global unless explicitly asked';
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KarmaUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
 
-/* ============ INIT ============ */
-function init() {
-  try {
-    var stored = localStorage.getItem('karma_chats');
-    if (stored) chats = JSON.parse(stored);
-  } catch(e) { chats = []; }
+-- Main Frame
+local Main = Instance.new("Frame")
+Main.Name = "MainFrame"
+Main.Size = UDim2.new(0, 300, 0, 380)
+Main.Position = UDim2.new(0.5, -150, 0.5, -190)
+Main.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+Main.BorderSizePixel = 0
+Main.Parent = ScreenGui
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(45, 45, 45)
+stroke.Thickness = 1
+stroke.Parent = Main
 
-  apiKey = localStorage.getItem('karma_apikey') || '';
-  modelName = localStorage.getItem('karma_model') || 'glm-4-flash';
+-- Title Bar (draggable)
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 34)
+TitleBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = Main
+Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 10)
 
-  renderList();
-  if (chats.length > 0) {
-    loadChat(chats[0].id);
-  }
-  document.getElementById('apiKeyIn').value = apiKey;
-  document.getElementById('modelIn').value = modelName;
-}
+local Title = Instance.new("TextLabel")
+Title.Text = "  Karma Commands"
+Title.Size = UDim2.new(1, -40, 1, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(220, 220, 220)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 13
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TitleBar
 
-/* ============ CHAT MANAGEMENT ============ */
-function newChat() {
-  var chat = {
-    id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
-    title: 'New Chat',
-    messages: [],
-    created: Date.now()
-  };
-  chats.unshift(chat);
-  saveChats();
-  loadChat(chat.id);
-  renderList();
-  closeSBMobile();
-}
+local Close = Instance.new("TextButton")
+Close.Text = "X"
+Close.Size = UDim2.new(0, 28, 0, 28)
+Close.Position = UDim2.new(1, -32, 0, 3)
+Close.BackgroundTransparency = 1
+Close.TextColor3 = Color3.fromRGB(120, 120, 120)
+Close.Font = Enum.Font.GothamBold
+Close.TextSize = 12
+Close.Parent = TitleBar
+Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
-function loadChat(id) {
-  activeChatId = id;
-  renderList();
-  renderMsgs();
-  setTimeout(function() {
-    document.getElementById('chatInput').focus();
-  }, 50);
-}
+-- Drag logic
+local dragging = false
+local dragStart, startPos
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+    end
+end)
+TitleBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+end)
+UIS.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
 
-function getChat() {
-  for (var i = 0; i < chats.length; i++) {
-    if (chats[i].id === activeChatId) return chats[i];
-  }
-  return null;
-}
+-- Command Input
+local Box = Instance.new("TextBox")
+Box.PlaceholderText = "Type a command..."
+Box.Size = UDim2.new(1, -16, 0, 30)
+Box.Position = UDim2.new(0, 8, 0, 42)
+Box.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Box.BorderSizePixel = 0
+Box.TextColor3 = Color3.fromRGB(210, 210, 210)
+Box.PlaceholderColor3 = Color3.fromRGB(70, 70, 70)
+Box.Font = Enum.Font.Gotham
+Box.TextSize = 12
+Box.ClearTextOnFocus = false
+Box.Parent = Main
+Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 6)
 
-function delChat(id, e) {
-  e.stopPropagation();
-  chats = chats.filter(function(c) { return c.id !== id; });
-  saveChats();
-  if (activeChatId === id) {
-    activeChatId = chats.length > 0 ? chats[0].id : null;
-    renderMsgs();
-  }
-  renderList();
-  toast('Chat deleted', 'ok');
-}
+-- Output Scroll
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(1, -16, 1, -84)
+Scroll.Position = UDim2.new(0, 8, 0, 80)
+Scroll.BackgroundTransparency = 1
+Scroll.ScrollBarThickness = 3
+Scroll.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 50)
+Scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+Scroll.Parent = Main
+Instance.new("UIListLayout", Scroll).Padding = UDim.new(0, 3)
 
-function clearAll() {
-  if (chats.length === 0) return;
-  chats = [];
-  activeChatId = null;
-  saveChats();
-  renderList();
-  renderMsgs();
-  toast('All chats cleared', 'ok');
-}
+local function log(text, col)
+    col = col or Color3.fromRGB(190, 190, 190)
+    local lbl = Instance.new("TextLabel")
+    lbl.Text = text
+    lbl.BackgroundTransparency = 1
+    lbl.TextColor3 = col
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 11
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Size = UDim2.new(1, 0, 0, 16)
+    lbl.TextWrapped = true
+    lbl.AutomaticSize = Enum.AutomaticSize.Y
+    lbl.Parent = Scroll
+    Scroll.CanvasPosition = Vector2.new(0, 99999)
+end
 
-function saveChats() {
-  try {
-    localStorage.setItem('karma_chats', JSON.stringify(chats));
-  } catch(e) {}
-}
+-- Commands
+local cmds = {}
 
-function exportChats() {
-  var data = JSON.stringify(chats, null, 2);
-  var blob = new Blob([data], {type:'application/json'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = 'karma_chats.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('Chats exported', 'ok');
-}
+cmds.speed = function(a)
+    local v = tonumber(a[1]) or 16
+    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.WalkSpeed = v; log("WalkSpeed -> " .. v, Color3.fromRGB(100,255,140)) end
+end
 
-/* ============ RENDER ============ */
-function renderList() {
-  var el = document.getElementById('chatList');
-  var html = '';
-  for (var i = 0; i < chats.length; i++) {
-    var c = chats[i];
-    var cls = c.id === activeChatId ? ' ci act' : ' ci';
-    html += '<div class="' + cls + '" onclick="loadChat(\'' + c.id + '\')">';
-    html += '<i class="fas fa-message" style="font-size:11px;color:var(--muted)"></i>';
-    html += '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(c.title) + '</span>';
-    html += '<button class="del" onclick="delChat(\'' + c.id + '\',event)" title="Delete"><i class="fas fa-xmark"></i></button>';
-    html += '</div>';
-  }
-  el.innerHTML = html;
-}
+cmds.jump = function(a)
+    local v = tonumber(a[1]) or 50
+    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.JumpPower = v; log("JumpPower -> " .. v, Color3.fromRGB(100,255,140)) end
+end
 
-function renderMsgs() {
-  var container = document.getElementById('chatMsgs');
-  var chat = getChat();
-  var welcome = document.getElementById('welcomeScr');
+cmds.god = function()
+    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.MaxHealth = math.huge; h.Health = math.huge; log("God mode on", Color3.fromRGB(100,255,140)) end
+end
 
-  // Remove old messages
-  var oldMsgs = container.querySelectorAll('.msg');
-  for (var i = 0; i < oldMsgs.length; i++) oldMsgs[i].remove();
+cmds.noclip = function()
+    RunService.Stepped:Connect(function()
+        local c = LocalPlayer.Character
+        if c then
+            for _, p in pairs(c:GetDescendants()) do
+                if p:IsA("BasePart") then p.CanCollide = false end
+            end
+        end
+    end)
+    log("Noclip on (rejoin to stop)", Color3.fromRGB(100,255,140))
+end
 
-  if (!chat || chat.messages.length === 0) {
-    welcome.style.display = 'flex';
-    return;
-  }
+cmds.tp = function(a)
+    if not a[1] then log("Usage: tp <player>", Color3.fromRGB(255,100,100)); return end
+    for _, p in pairs(Players:GetPlayers()) do
+        if p.Name:lower():find(a[1]:lower()) then
+            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local tHrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+            if hrp and tHrp then hrp.CFrame = tHrp.CFrame; log("TP to " .. p.Name, Color3.fromRGB(100,255,140)) end
+            return
+        end
+    end
+    log("Player not found", Color3.fromRGB(255,100,100))
+end
 
-  welcome.style.display = 'none';
+cmds.reset = function()
+    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.Health = 0 end
+end
 
-  var html = '';
-  for (var i = 0; i < chat.messages.length; i++) {
-    var m = chat.messages[i];
-    var isU = m.role === 'user';
-    html += '<div class="msg msg-' + (isU ? 'u' : 'a') + '">';
-    html += '<div class="msg-av">' + (isU ? 'U' : 'K') + '</div>';
-    html += '<div class="msg-c">';
-    html += '<div class="msg-r">' + (isU ? 'You' : 'Karma AI') + '</div>';
-    html += '<div class="msg-b">' + fmtMsg(m.content) + '</div>';
-    html += '</div></div>';
-  }
+cmds.help = function()
+    log("=== Karma Commands ===", Color3.fromRGB(255,255,255))
+    log("speed <n>  - Set walk speed", Color3.fromRGB(170,170,170))
+    log("jump <n>   - Set jump power", Color3.fromRGB(170,170,170))
+    log("god        - God mode", Color3.fromRGB(170,170,170))
+    log("noclip     - No collision", Color3.fromRGB(170,170,170))
+    log("tp <name>  - Teleport to player", Color3.fromRGB(170,170,170))
+    log("reset      - Die", Color3.fromRGB(170,170,170))
+    log("help       - Show commands", Color3.fromRGB(170,170,170))
+end
 
-  container.insertAdjacentHTML('beforeend', html);
-  container.scrollTop = container.scrollHeight;
-  addCopyBtns();
-}
+Box.FocusLost:Connect(function(enter)
+    if not enter then return end
+    local t = Box.Text
+    Box.Text = ""
+    if t == "" then return end
+    log("> " .. t, Color3.fromRGB(255,255,255))
+    local parts = t:split(" ")
+    local cmd = parts[1]:lower()
+    local args = {}
+    for i = 2, #parts do args[i-1] = parts[i] end
+    if cmds[cmd] then cmds[cmd](args)
+    else log("Unknown: " .. cmd .. " (type help)", Color3.fromRGB(255,100,100)) end
+end)
 
-function fmtMsg(text) {
-  if (!text) return '';
-  var s = esc(text);
-  // Code blocks
-  s = s.replace(/```(\w*)\n([\s\S]*?)```/g, function(_, lang, code) {
-    return '<pre><code>' + code.trim() + '</code></pre>';
-  });
-  // Inline code
-  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // Bold
-  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Italic
-  s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  // Paragraphs
-  var parts = s.split('\n\n');
-  var out = '';
-  for (var i = 0; i < parts.length; i++) {
-    if (parts[i].indexOf('<pre>') === 0) {
-      out += parts[i];
-    } else {
-      out += '<p>' + parts[i].replace(/\n/g, '<br>') + '</p>';
-    }
-  }
-  return out;
-}
+-- Toggle with RightCtrl
+UIS.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.RightControl then
+        Main.Visible = not Main.Visible
+    end
+end)
 
-function addCopyBtns() {
-  var pres = document.querySelectorAll('.msg-b pre');
-  for (var i = 0; i < pres.length; i++) {
-    var pre = pres[i];
-    if (pre.querySelector('.cpy-btn')) continue;
-    var btn = document.createElement('button');
-    btn.className = 'cpy-btn';
-    btn.textContent = 'Copy';
-    btn.setAttribute('data-idx', i);
-    btn.onclick = function() {
-      var code = this.parentElement.querySelector('code').textContent;
-      navigator.clipboard.writeText(code).then(function() {
-        btn.textContent = 'Copied';
-        setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
-      });
-    };
-    pre.appendChild(btn);
-  }
-}
+log("Karma loaded. Press RightCtrl to toggle.", Color3.fromRGB(255,255,255))
+log("Type 'help' for commands.", Color3.fromRGB(140,140,140))
+\`\`\`
 
-/* ============ FILES ============ */
-function handleFiles(files) {
-  for (var i = 0; i < files.length; i++) {
-    (function(file) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        attachedFiles.push({name: file.name, content: e.target.result});
-        renderFBar();
-      };
-      reader.readAsText(file);
-    })(files[i]);
-  }
-  document.getElementById('fInput').value = '';
-}
+**How to use:**
+- Press **Right Ctrl** to toggle the GUI
+- Type commands: \`speed 50\`, \`god\`, \`noclip\`, \`tp PlayerName\`
+- Click X or Right Ctrl to hide
 
-function removeFile(idx) {
-  attachedFiles.splice(idx, 1);
-  renderFBar();
-}
+*Add your GLM API key in Settings for fully custom AI-generated scripts.*`;
+            }
+            
+            if (last.includes('rename') || last.includes('refactor') || last.includes('clean')) {
+                return `I'll refactor your code! Here's an example of what I do:
 
-function renderFBar() {
-  var bar = document.getElementById('fbar');
-  if (attachedFiles.length === 0) {
-    bar.classList.remove('show');
-    bar.innerHTML = '';
-    return;
-  }
-  bar.classList.add('show');
-  var html = '';
-  for (var i = 0; i < attachedFiles.length; i++) {
-    html += '<div class="fchip"><i class="fas fa-file-code"></i> ' + esc(attachedFiles[i].name);
-    html += ' <button onclick="removeFile(' + i + ')"><i class="fas fa-xmark"></i></button></div>';
-  }
-  bar.innerHTML = html;
-}
+**Before (messy):**
+\`\`\`lua
+local a = game.Players.LocalPlayer
+local b = a.Character or a.CharacterAdded:Wait()
+local c = b:FindFirstChild("HumanoidRootPart")
+local d = Instance.new("Part")
+d.Size = Vector3.new(3,1,3)
+d.Position = c.Position + Vector3.new(0,3,0)
+d.Parent = workspace
+d.Anchored = true
+d.BrickColor = BrickColor.new("Really red")
+\`\`\`
 
-/* ============ SEND ============ */
-function quickP(text) {
-  document.getElementById('chatInput').value = text;
-  autoR(document.getElementById('chatInput'));
-  sendMsg();
-}
+**After (clean):**
+\`\`\`lua
+-- Create a red platform above the player
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
-function sendMsg() {
-  var input = document.getElementById('chatInput');
-  var text = input.value.trim();
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
 
-  if ((!text && attachedFiles.length === 0) || isGenerating) return;
+local platform = Instance.new("Part")
+platform.Name = "SpawnPlatform"
+platform.Size = Vector3.new(3, 1, 3)
+platform.Position = rootPart.Position + Vector3.new(0, 3, 0)
+platform.Anchored = true
+platform.BrickColor = BrickColor.new("Really red")
+platform.Parent = workspace
+\`\`\`
 
-  // Ensure we have a chat
-  if (!activeChatId) {
-    newChat();
-  }
+**Changes:**
+- \`a\` → \`LocalPlayer\` - descriptive name
+- \`b\` → \`character\` - clear purpose
+- \`c\` → \`rootPart\` - specific part
+- \`d\` → \`platform\` - describes the object
+- Added \`GetService("Players")\` - best practice
+- Added comment explaining the script
+- Set \`Name\` property for Studio identification
 
-  var chat = getChat();
-  if (!chat) return;
+**Upload your script file** with the paperclip button and I'll refactor your actual code!`;
+            }
+            
+            // Default fallback
+            return `I can help with that! Here's what I can do:
 
-  // Build user message
-  var userContent = text;
-  if (attachedFiles.length > 0) {
-    var fSection = '';
-    for (var i = 0; i < attachedFiles.length; i++) {
-      fSection += '[File: ' + attachedFiles[i].name + ']\n```\n' + attachedFiles[i].content + '\n```\n\n';
-    }
-    userContent = fSection + text;
-  }
+**Script Generation**
+- Write complete Roblox scripts from your description
+- GUI systems, combat, tools, plugins, etc.
 
-  // Add user message
-  chat.messages.push({role: 'user', content: userContent});
+**Code Modification**
+- Rename variables to be readable
+- Add comments and documentation
+- Restructure messy code into clean patterns
 
-  // Auto-title
-  if (chat.messages.length === 1) {
-    var title = text.length > 40 ? text.substring(0, 40) + '...' : text;
-    if (!title) title = 'File Analysis';
-    chat.title = title;
-    renderList();
-  }
+**Debugging**
+- Find and fix errors in your scripts
+- Explain why something isn't working
+- Suggest performance improvements
 
-  // Clear input
-  input.value = '';
-  autoR(input);
-  attachedFiles = [];
-  renderFBar();
-  saveChats();
-  renderMsgs();
+**Modernization**
+- Convert old scripts to latest Roblox API
+- Add Luau type annotations
+- Replace deprecated functions
 
-  // Typing
-  isGenerating = true;
-  document.getElementById('sendBtn').disabled = true;
-  document.getElementById('inputArea').classList.add('thinking');
-  showTyping();
+**To get started:**
+1. **Describe what you want** in detail, or
+2. **Upload a .lua file** using the paperclip icon
 
-  callGLM(chat.messages).then(function(response) {
-    hideTyping();
-    chat.messages.push({role: 'assistant', content: response});
-    saveChats();
-    renderMsgs();
-  }).catch(function(err) {
-    hideTyping();
-    chat.messages.push({role: 'assistant', content: 'Error: ' + err.message});
-    saveChats();
-    renderMsgs();
-    toast(err.message, 'err');
-  }).finally(function() {
-    isGenerating = false;
-    document.getElementById('sendBtn').disabled = false;
-    document.getElementById('inputArea').classList.remove('thinking');
-  });
-}
+**Try these:**
+- "Write a sprint system with stamina bar GUI"
+- "Make NPCs patrol between waypoints"
+- "Add a cooldown system to my ability script"
+- "Optimize this script for performance"
 
-function callGLM(messages) {
-  if (!apiKey) {
-    return Promise.resolve(fallback(messages));
-  }
-
-  var body = {
-    model: modelName,
-    messages: [{role: 'system', content: SYS_PROMPT}],
-    temperature: 0.7,
-    max_tokens: 4096
-  };
-
-  for (var i = 0; i < messages.length; i++) {
-    body.messages.push({role: messages[i].role, content: messages[i].content});
-  }
-
-  return fetch(GLM_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + apiKey
-    },
-    body: JSON.stringify(body)
-  }).then(function(resp) {
-    if (!resp.ok) {
-      return resp.json().then(function(errData) {
-        throw new Error((errData.error && errData.error.message) || ('API error ' + resp.status));
-      }).catch(function(e) {
-        if (e.message.indexOf('API error') === 0) throw e;
-        throw new Error('API returned ' + resp.status);
-      });
-    }
-    return resp.json();
-  }).then(function(data) {
-    return data.choices[0].message.content;
-  });
-}
-
-/* ============ FALLBACK (no API key) ============ */
-function fallback(messages) {
-  var last = messages[messages.length - 1].content.toLowerCase();
-
-  if (last.indexOf('infinite yield') !== -1 || (last.indexOf('gui') !== -1 && last.indexOf('command') !== -1)) {
-    return 'Here\'s a clean Infinite Yield-style command script with a draggable GUI:\n\n```lua\n-- Karma | Command Script with GUI\nlocal Players = game:GetService("Players")\nlocal UIS = game:GetService("UserInputService")\nlocal RunService = game:GetService("RunService")\n\nlocal LocalPlayer = Players.LocalPlayer\nlocal PlayerGui = LocalPlayer:WaitForChild("PlayerGui")\n\n-- Create ScreenGui\nlocal ScreenGui = Instance.new("ScreenGui")\nScreenGui.Name = "KarmaUI"\nScreenGui.ResetOnSpawn = false\nScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling\nScreenGui.Parent = PlayerGui\n\n-- Main Frame\nlocal Main = Instance.new("Frame")\nMain.Name = "MainFrame"\nMain.Size = UDim2.new(0, 300, 0, 380)\nMain.Position = UDim2.new(0.5, -150, 0.5, -190)\nMain.BackgroundColor3 = Color3.fromRGB(16, 16, 16)\nMain.BorderSizePixel = 0\nMain.Parent = ScreenGui\nInstance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)\nlocal stroke = Instance.new("UIStroke")\nstroke.Color = Color3.fromRGB(45, 45, 45)\nstroke.Thickness = 1\nstroke.Parent = Main\n\n-- Title Bar (draggable)\nlocal TitleBar = Instance.new("Frame")\nTitleBar.Size = UDim2.new(1, 0, 0, 34)\nTitleBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)\nTitleBar.BorderSizePixel = 0\nTitleBar.Parent = Main\nInstance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 10)\n\nlocal Title = Instance.new("TextLabel")\nTitle.Text = "  Karma Commands"\nTitle.Size = UDim2.new(1, -40, 1, 0)\nTitle.BackgroundTransparency = 1\nTitle.TextColor3 = Color3.fromRGB(220, 220, 220)\nTitle.Font = Enum.Font.GothamBold\nTitle.TextSize = 13\nTitle.TextXAlignment = Enum.TextXAlignment.Left\nTitle.Parent = TitleBar\n\nlocal Close = Instance.new("TextButton")\nClose.Text = "X"\nClose.Size = UDim2.new(0, 28, 0, 28)\nClose.Position = UDim2.new(1, -32, 0, 3)\nClose.BackgroundTransparency = 1\nClose.TextColor3 = Color3.fromRGB(120, 120, 120)\nClose.Font = Enum.Font.GothamBold\nClose.TextSize = 12\nClose.Parent = TitleBar\nClose.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)\n\n-- Drag logic\nlocal dragging = false\nlocal dragStart, startPos\nTitleBar.InputBegan:Connect(function(input)\n    if input.UserInputType == Enum.UserInputType.MouseButton1 then\n        dragging = true\n        dragStart = input.Position\n        startPos = Main.Position\n    end\nend)\nTitleBar.InputEnded:Connect(function(input)\n    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end\nend)\nUIS.InputChanged:Connect(function(input)\n    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then\n        local delta = input.Position - dragStart\n        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)\n    end\nend)\n\n-- Command Input\nlocal Box = Instance.new("TextBox")\nBox.PlaceholderText = "Type a command..."\nBox.Size = UDim2.new(1, -16, 0, 30)\nBox.Position = UDim2.new(0, 8, 0, 42)\nBox.BackgroundColor3 = Color3.fromRGB(10, 10, 10)\nBox.BorderSizePixel = 0\nBox.TextColor3 = Color3.fromRGB(210, 210, 210)\nBox.PlaceholderColor3 = Color3.fromRGB(70, 70, 70)\nBox.Font = Enum.Font.Gotham\nBox.TextSize = 12\nBox.ClearTextOnFocus = false\nBox.Parent = Main\nInstance.new("UICorner", Box).CornerRadius = UDim.new(0, 6)\n\n-- Output Scroll\nlocal Scroll = Instance.new("ScrollingFrame")\nScroll.Size = UDim2.new(1, -16, 1, -84)\nScroll.Position = UDim2.new(0, 8, 0, 80)\nScroll.BackgroundTransparency = 1\nScroll.ScrollBarThickness = 3\nScroll.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 50)\nScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y\nScroll.Parent = Main\nInstance.new("UIListLayout", Scroll).Padding = UDim.new(0, 3)\n\nlocal function log(text, col)\n    col = col or Color3.fromRGB(190, 190, 190)\n    local lbl = Instance.new("TextLabel")\n    lbl.Text = text\n    lbl.BackgroundTransparency = 1\n    lbl.TextColor3 = col\n    lbl.Font = Enum.Font.Gotham\n    lbl.TextSize = 11\n    lbl.TextXAlignment = Enum.TextXAlignment.Left\n    lbl.Size = UDim2.new(1, 0, 0, 16)\n    lbl.TextWrapped = true\n    lbl.AutomaticSize = Enum.AutomaticSize.Y\n    lbl.Parent = Scroll\n    Scroll.CanvasPosition = Vector2.new(0, 99999)\nend\n\n-- Commands\nlocal cmds = {}\n\ncmds.speed = function(a)\n    local v = tonumber(a[1]) or 16\n    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\n    if h then h.WalkSpeed = v; log("WalkSpeed -> " .. v, Color3.fromRGB(100,255,140)) end\nend\n\ncmds.jump = function(a)\n    local v = tonumber(a[1]) or 50\n    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\n    if h then h.JumpPower = v; log("JumpPower -> " .. v, Color3.fromRGB(100,255,140)) end\nend\n\ncmds.god = function()\n    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\n    if h then h.MaxHealth = math.huge; h.Health = math.huge; log("God mode on", Color3.fromRGB(100,255,140)) end\nend\n\ncmds.noclip = function()\n    RunService.Stepped:Connect(function()\n        local c = LocalPlayer.Character\n        if c then\n            for _, p in pairs(c:GetDescendants()) do\n                if p:IsA("BasePart") then p.CanCollide = false end\n            end\n        end\n    end)\n    log("Noclip on (rejoin to stop)", Color3.fromRGB(100,255,140))\nend\n\ncmds.tp = function(a)\n    if not a[1] then log("Usage: tp <player>", Color3.fromRGB(255,100,100)); return end\n    for _, p in pairs(Players:GetPlayers()) do\n        if p.Name:lower():find(a[1]:lower()) then\n            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")\n            local tHrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")\n            if hrp and tHrp then hrp.CFrame = tHrp.CFrame; log("TP to " .. p.Name, Color3.fromRGB(100,255,140)) end\n            return\n        end\n    end\n    log("Player not found", Color3.fromRGB(255,100,100))\nend\n\ncmds.reset = function()\n    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\n    if h then h.Health = 0 end\nend\n\ncmds.help = function()\n    log("=== Karma Commands ===", Color3.fromRGB(255,255,255))\n    log("speed <n>  - Set walk speed", Color3.fromRGB(170,170,170))\n    log("jump <n>   - Set jump power", Color3.fromRGB(170,170,170))\n    log("god        - God mode", Color3.fromRGB(170,170,170))\n    log("noclip     - No collision", Color3.fromRGB(170,170,170))\n    log("tp <name>  - Teleport to player", Color3.fromRGB(170,170,170))\n    log("reset      - Die", Color3.fromRGB(170,170,170))\n    log("help       - Show commands", Color3.fromRGB(170,170,170))\nend\n\nBox.FocusLost:Connect(function(enter)\n    if not enter then return end\n    local t = Box.Text\n    Box.Text = ""\n    if t == "" then return end\n    log("> " .. t, Color3.fromRGB(255,255,255))\n    local parts = t:split(" ")\n    local cmd = parts[1]:lower()\n    local args = {}\n    for i = 2, #parts do args[i-1] = parts[i] end\n    if cmds[cmd] then cmds[cmd](args)\n    else log("Unknown: " .. cmd .. " (type help)", Color3.fromRGB(255,100,100)) end\nend)\n\n-- Toggle with RightCtrl\nUIS.InputBegan:Connect(function(input, gp)\n    if gp then return end\n    if input.KeyCode == Enum.KeyCode.RightControl then\n        Main.Visible = not Main.Visible\n    end\nend)\n\nlog("Karma loaded. Press RightCtrl to toggle.", Color3.fromRGB(255,255,255))\nlog("Type \'help\' for commands.", Color3.fromRGB(140,140,140))\n```\n\n**How to use:**\n- Press **Right Ctrl** to toggle the GUI\n- Type commands: `speed 50`, `god`, `noclip`, `tp PlayerName`\n- Click X or Right Ctrl to hide\n\n*Add your GLM API key in Settings for fully custom AI-generated scripts.*';
-  }
-
-  if (last.indexOf('rename') !== -1 || last.indexOf('refactor') !== -1 || last.indexOf('clean') !== -1) {
-    return 'I\'ll refactor your code! Here\'s an example of what I do:\n\n**Before (messy):**\n```lua\nlocal a = game.Players.LocalPlayer\nlocal b = a.Character or a.CharacterAdded:Wait()\nlocal c = b:FindFirstChild("HumanoidRootPart")\nlocal d = Instance.new("Part")\nd.Size = Vector3.new(3,1,3)\nd.Position = c.Position + Vector3.new(0,3,0)\nd.Parent = workspace\nd.Anchored = true\nd.BrickColor = BrickColor.new("Really red")\n```\n\n**After (clean):**\n```lua\n-- Create a red platform above the player\nlocal Players = game:GetService("Players")\nlocal LocalPlayer = Players.LocalPlayer\n\nlocal character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()\nlocal rootPart = character:WaitForChild("HumanoidRootPart")\n\nlocal platform = Instance.new("Part")\nplatform.Name = "SpawnPlatform"\nplatform.Size = Vector3.new(3, 1, 3)\nplatform.Position = rootPart.Position + Vector3.new(0, 3, 0)\nplatform.Anchored = true\nplatform.BrickColor = BrickColor.new("Really red")\nplatform.Parent = workspace\n```\n\n**Changes:**\n- `a` -> `LocalPlayer` - descriptive name\n- `b` -> `character` - clear purpose\n- `c` -> `rootPart` - specific part\n- `d` -> `platform` - describes the object\n- Added `GetService("Players")` - best practice\n- Added comment explaining the script\n- Set `Name` property for Studio identification\n\n**Upload your script file** with the paperclip button and I\'ll refactor your actual code!';
-  }
-
-  if (last.indexOf('fix') !== -1 || last.indexOf('debug') !== -1 || last.indexOf('error') !== -1) {
-    return 'I\'ll help you debug! Common Roblox errors and fixes:\n\n**Error: "attempt to index nil with Character"**\n```lua\n-- BAD\nlocal char = game.Players.LocalPlayer.Character\nlocal hum = char.Humanoid -- errors if char is nil\n\n-- FIX\nlocal Players = game:GetService("Players")\nlocal character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()\nlocal humanoid = character:WaitForChild("Humanoid")\n```\n\n**Error: "Infinite yield possible"**\n```lua\n-- BAD\nlocal part = workspace:FindFirstChild("SpecialPart")\n\n-- FIX\nlocal part = workspace:FindFirstChildWhichIsA("BasePart")\nif not part then\n    warn("Part not found!")\n    return\nend\n```\n\n**Error: deprecated connect()**\n```lua\n-- BAD\nhumanoid.Died:connect(function() end)\n\n-- FIX\nhumanoid.Died:Connect(function()\n    print("Player died")\nend)\n```\n\n**Error: "invalid argument #1"**\n```lua\n-- BAD: passing wrong type\nlocal num = "hello"\nprint(num + 5) -- error\n\n-- FIX: validate types\nlocal num = tonumber("hello") or 0\nprint(num + 5)\n```\n\n**Upload your broken script** and I\'ll find and fix every issue!';
-  }
-
-  if (last.indexOf('modern') !== -1 || last.indexOf('update') !== -1 || last.indexOf('convert') !== -1) {
-    return 'Here\'s a modernization guide with before/after:\n\n**1. Values -> Attributes**\n```lua\n-- OLD\nlocal val = Instance.new("IntValue")\nval.Name = "Health"\nval.Value = 100\nval.Parent = enemy\n\n-- NEW\nenemy:SetAttribute("Health", 100)\nlocal hp = enemy:GetAttribute("Health")\n```\n\n**2. wait() -> task.wait()**\n```lua\n-- OLD\nwait(1)\nspawn(function() end)\ndelay(2, function() end)\n\n-- NEW\ntask.wait(1)\ntask.spawn(function() end)\ntask.delay(2, function() end)\n```\n\n**3. Luau Type Annotations**\n```lua\n-- NEW\nlocal player: Player = Players.LocalPlayer\nlocal health: number = character:GetAttribute("Health")\nlocal enemies: {BasePart} = {}\n\nlocal function damage(target: BasePart, amount: number): ()\n    -- typed function\nend\n```\n\n**4. Modern Signal Patterns**\n```lua\n-- OLD\npart.Touched:connect(function(hit) end)\n\n-- NEW with proper nil checks\npart.Touched:Connect(function(hit)\n    local character = hit.Parent\n    local humanoid = character and character:FindFirstChildOfClass("Humanoid")\n    if not humanoid then return end\n    -- handle\nend)\n```\n\n**Upload your script** and I\'ll modernize the whole thing!';
-  }
-
-  if (last.indexOf('sprint') !== -1 || last.indexOf('stamina') !== -1) {
-    return 'Here\'s a clean sprint system with stamina bar GUI:\n\n```lua\n-- Karma | Sprint System with Stamina GUI\nlocal Players = game:GetService("Players")\nlocal UIS = game:GetService("UserInputService")\nlocal RunService = game:GetService("RunService")\nlocal TweenService = game:GetService("TweenService")\n\nlocal LocalPlayer = Players.LocalPlayer\nlocal PlayerGui = LocalPlayer:WaitForChild("PlayerGui")\n\n-- Config\nlocal SPRINT_SPEED = 24\nlocal WALK_SPEED = 16\nlocal MAX_STAMINA = 100\nlocal DRAIN_RATE = 15      -- per second while sprinting\nlocal REGEN_RATE = 10      -- per second while not sprinting\nlocal MIN_STAMINA = 10     -- minimum stamina to start sprinting\n\nlocal sprinting = false\nlocal stamina = MAX_STAMINA\nlocal canSprint = true\n\n-- GUI\nlocal ScreenGui = Instance.new("ScreenGui")\nScreenGui.Name = "StaminaGUI"\nScreenGui.ResetOnSpawn = false\nScreenGui.Parent = PlayerGui\n\nlocal BarBG = Instance.new("Frame")\nBarBG.Name = "BarBackground"\nBarBG.Size = UDim2.new(0, 200, 0, 8)\nBarBG.Position = UDim2.new(0.5, -100, 1, -50)\nBarBG.BackgroundColor3 = Color3.fromRGB(30, 30, 30)\nBarBG.BorderSizePixel = 0\nBarBG.Parent = ScreenGui\nInstance.new("UICorner", BarBG).CornerRadius = UDim.new(0, 4)\n\nlocal BarFill = Instance.new("Frame")\nBarFill.Name = "BarFill"\nBarFill.Size = UDim2.new(1, 0, 1, 0)\nBarFill.BackgroundColor3 = Color3.fromRGB(230, 230, 230)\nBarFill.BorderSizePixel = 0\nBarFill.Parent = BarBG\nInstance.new("UICorner", BarFill).CornerRadius = UDim.new(0, 4)\n\nlocal function updateBar()\n    local ratio = stamina / MAX_STAMINA\n    local tween = TweenService:Create(BarFill, TweenInfo.new(0.15), {\n        Size = UDim2.new(ratio, 0, 1, 0)\n    })\n    tween:Play()\n\n    -- Color shift: white -> dim gray when low\n    local c = math.floor(100 + 130 * ratio)\n    BarFill.BackgroundColor3 = Color3.fromRGB(c, c, c)\nend\n\n-- Sprint logic\nlocal function startSprint()\n    if not canSprint or stamina < MIN_STAMINA then return end\n    sprinting = true\n    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\n    if hum then hum.WalkSpeed = SPRINT_SPEED end\nend\n\nlocal function stopSprint()\n    sprinting = false\n    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\n    if hum then hum.WalkSpeed = WALK_SPEED end\nend\n\nUIS.InputBegan:Connect(function(input, gp)\n    if gp then return end\n    if input.KeyCode == Enum.KeyCode.LeftShift then\n        startSprint()\n    end\nend)\n\nUIS.InputEnded:Connect(function(input, gp)\n    if gp then return end\n    if input.KeyCode == Enum.KeyCode.LeftShift then\n        stopSprint()\n    end\nend)\n\n-- Stamina loop\nRunService.Heartbeat:Connect(function(dt)\n    if sprinting then\n        stamina = math.max(0, stamina - DRAIN_RATE * dt)\n        if stamina <= 0 then\n            stopSprint()\n            canSprint = false\n            task.delay(1.5, function() canSprint = true end)\n        end\n    else\n        stamina = math.min(MAX_STAMINA, stamina + REGEN_RATE * dt)\n    end\n    updateBar()\nend)\n\n-- Reset on character spawn\nLocalPlayer.CharacterAdded:Connect(function(char)\n    local hum = char:WaitForChild("Humanoid")\n    hum.WalkSpeed = WALK_SPEED\n    sprinting = false\n    stamina = MAX_STAMINA\n    canSprint = true\nend)\n```\n\n**Features:**\n- Hold **Left Shift** to sprint\n- Stamina drains while sprinting, regens when walking\n- Bar turns dim when stamina is low\n- 1.5s cooldown when stamina hits zero\n- Resets properly on respawn';
-  }
-
-  return 'I can help with that! Here\'s what I can do:\n\n**Script Generation**\n- Write complete Roblox scripts from your description\n- GUI systems, combat, tools, plugins, etc.\n\n**Code Modification**\n- Rename variables to be readable\n- Add comments and documentation\n- Restructure messy code into clean patterns\n\n**Debugging**\n- Find and fix errors in your scripts\n- Explain why something isn\'t working\n- Suggest performance improvements\n\n**Modernization**\n- Convert old scripts to latest Roblox API\n- Add Luau type annotations\n- Replace deprecated functions\n\n**To get started:**\n1. **Describe what you want** in detail, or\n2. **Upload a .lua file** using the paperclip icon\n\n**Try these:**\n- "Write a sprint system with stamina bar GUI"\n- "Make NPCs patrol between waypoints"\n- "Add a cooldown system to my ability script"\n- "Optimize this script for performance"\n\n*For fully custom AI-generated scripts, add your free GLM API key in Settings (top right).*';
-}
-
-/* ============ TYPING ============ */
-function showTyping() {
-  var c = document.getElementById('chatMsgs');
-  var d = document.createElement('div');
-  d.className = 'msg msg-a';
-  d.id = 'typMsg';
-  d.innerHTML = '<div class="msg-av">K</div><div class="msg-c"><div class="msg-r">Karma AI</div><div class="typing"><span></span><span></span><span></span></div></div>';
-  c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
-}
-
-function hideTyping() {
-  var el = document.getElementById('typMsg');
-  if (el) el.remove();
-}
-
-/* ============ SETTINGS ============ */
-function openSet() {
-  document.getElementById('setModal').classList.add('show');
-  document.getElementById('apiKeyIn').value = apiKey;
-  document.getElementById('modelIn').value = modelName;
-}
-
-function closeSet() {
-  document.getElementById('setModal').classList.remove('show');
-}
-
-function saveSet() {
-  apiKey = document.getElementById('apiKeyIn').value.trim();
-  modelName = document.getElementById('modelIn').value.trim() || 'glm-4-flash';
-  localStorage.setItem('karma_apikey', apiKey);
-  localStorage.setItem('karma_model', modelName);
-  closeSet();
-  if (apiKey) {
-    toast('API key saved', 'ok');
-  } else {
-    toast('Using built-in templates', 'ok');
-  }
-}
-
-document.getElementById('setModal').addEventListener('click', function(e) {
-  if (e.target === this) closeSet();
-});
-
-/* ============ UTILS ============ */
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMsg();
-  }
-}
-
-function autoR(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 150) + 'px';
-}
-
-function esc(s) {
-  var d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-function toast(msg, type) {
-  var c = document.getElementById('toastC');
-  var t = document.createElement('div');
-  t.className = 'toast ' + (type || 'ok');
-  var icon = type === 'err' ? 'exclamation-circle' : 'check-circle';
-  t.innerHTML = '<i class="fas fa-' + icon + '"></i> ' + esc(msg);
-  c.appendChild(t);
-  setTimeout(function() { if (t.parentNode) t.remove(); }, 3200);
-}
-
-function toggleSB() {
-  document.getElementById('sidebar').classList.toggle('open');
-}
-
-function closeSBMobile() {
-  document.getElementById('sidebar').classList.remove('open');
-}
-
-document.querySelector('.chat-area').addEventListener('click', closeSBMobile);
-
-/* ============ START ============ */
-init();
-</script>
-</body>
+*For fully custom AI-generated scripts, add your free GLM API key in Settings (top right).*`;
+        }
+        
+        // ============ TYPING ============
+        function showTyping() {
+            const c = document.getElementById('chatMsgs');
+            const d = document.createElement('div');
+            d.className = 'msg msg-a';
+            d.id = 'typMsg';
+            d.innerHTML = `<div class="msg-av">K</div><div class="msg-c"><div class="msg-r">Karma AI</div><div class="typing"><span></span><span></span><span></span></div></div>`;
+            c.appendChild(d);
+            c.scrollTop = c.scrollHeight;
+        }
+        
+        function hideTyping() {
+            const el = document.getElementById('typMsg');
+            if (el) el.remove();
+        }
+        
+        // ============ SETTINGS ============
+        function openSet() {
+            const modal = document.getElementById('setModal');
+            modal.classList.add('show');
+            
+            document.getElementById('apiKeyIn').value = apiKey;
+            document.getElementById('modelIn').value = modelName;
+        }
+        
+        function closeSet() {
+            document.getElementById('setModal').classList.remove('show');
+        }
+        
+        function saveSet() {
+            apiKey = document.getElementById('apiKeyIn').value.trim();
+            modelName = document.getElementById('modelIn').value.trim() || 'glm-4-flash';
+            
+            localStorage.setItem('karma_apikey', apiKey);
+            localStorage.setItem('karma_model', modelName);
+            
+            closeSet();
+            
+            if (apiKey) {
+                toast('API key saved', 'ok');
+            } else {
+                toast('Using built-in templates', 'ok');
+            }
+        }
+        
+        document.getElementById('setModal').addEventListener('click', function(e) {
+            if (e.target === this) closeSet();
+        });
+        
+        // ============ UTILS ============
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMsg();
+            }
+        }
+        
+        function autoR(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+        }
+        
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+        
+        function toast(msg, type) {
+            const c = document.getElementById('toastC');
+            const t = document.createElement('div');
+            t.className = `toast ${type || 'ok'}`;
+            
+            const icon = type === 'err' ? 'exclamation-circle' : 'check-circle';
+            t.innerHTML = `<i class="fas fa-${icon}"></i> ${esc(msg)}`;
+            
+            c.appendChild(t);
+            
+            setTimeout(() => {
+                if (t.parentNode) t.remove();
+            }, 3200);
+        }
+        
+        function toggleSB() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+        
+        function closeSBMobile() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+        
+        document.querySelector('.chat-area').addEventListener('click', closeSBMobile);
+        
+        // ============ START ============
+        window.onload = function() {
+            init();
+        };
+        
+        // Optional: Add keyboard shortcut for auth
+        document.addEventListener('keydown', function(e) {
+            if (e.metaKey && e.key === "/") {
+                e.preventDefault();
+                const modal = document.getElementById('authModal');
+                if (modal.classList.contains('show')) {
+                    closeAuthModal();
+                } else {
+                    openAuthModal('signin');
+                }
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a194d604ef30fa80',t:'MTc4Mzc0MTc0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
