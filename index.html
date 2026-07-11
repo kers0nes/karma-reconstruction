@@ -7,11 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    
     <style>
         :root {
             --bg:#050505;--bg2:#0a0a0a;--card:#0f0f0f;--card2:#141414;
@@ -21,220 +16,89 @@
             --danger:#ff4444;--success:#44ff88;
         }
         *{margin:0;padding:0;box-sizing:border-box;}
-        html{scroll-behavior:smooth;}
-        body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;}
-        ::-webkit-scrollbar{width:5px;}
-        ::-webkit-scrollbar-track{background:var(--bg);}
-        ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+        body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;}
         
-        .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
-            background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);
-            background-size:60px 60px;}
-        .bg-glow{position:fixed;z-index:0;pointer-events:none;width:500px;height:500px;border-radius:50%;filter:blur(140px);opacity:.25;}
-        .bg-g1{top:-150px;left:-100px;background:rgba(255,255,255,0.06);}
-        .bg-g2{bottom:-150px;right:-100px;background:rgba(255,255,255,0.03);}
-        
-        .app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
-        
-        header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(5,5,5,0.9);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;flex-shrink:0;}
-        .logo{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:700;letter-spacing:-.5px;}
-        .logo-icon{width:34px;height:34px;border:2px solid var(--fg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;}
+        .app{display:flex;flex-direction:column;height:100vh;}
+        header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(5,5,5,0.95);}
+        .logo{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:700;}
+        .logo-icon{width:34px;height:34px;border:2px solid var(--fg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;}
         
         .header-right{display:flex;align-items:center;gap:10px;}
-        
         .user-section{display:flex;align-items:center;gap:8px;}
-        .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--fg2);overflow:hidden;cursor:pointer;}
-        .user-avatar img{width:100%;height:100%;object-fit:cover;}
+        .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:600;cursor:pointer;}
         .user-name{font-size:13px;font-weight:500;color:var(--fg2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
         
-        .btn{padding:7px 16px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
-        .btn-p{background:var(--accent);color:var(--bg);}
-        .btn-p:hover{background:var(--accent2);transform:translateY(-1px);}
+        .btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+        .btn-p{background:#fff;color:#000;}
         .btn-g{background:transparent;color:var(--fg2);border:1px solid var(--border);}
-        .btn-g:hover{border-color:var(--border2);color:var(--fg);background:var(--glow);}
-        .btn-d{background:rgba(255,68,68,.08);color:var(--danger);border:1px solid rgba(255,68,68,.15);}
-        .btn-d:hover{background:rgba(255,68,68,.18);}
-        
-        .btn-google{background:#fff;color:#000;border:1px solid #ddd;font-weight:600;}
-        .btn-google:hover{background:#f8f8f8;}
-        .btn-google i{color:#4285f4;}
+        .btn-d{background:rgba(255,68,68,.1);color:#ff4444;border:1px solid rgba(255,68,68,.2);}
         
         .main-wrap{flex:1;display:flex;overflow:hidden;}
+        .sidebar{width:260px;border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;}
+        .sb-head{padding:14px;}
+        .new-btn{width:100%;padding:10px;background:var(--card);border:1px dashed var(--border2);border-radius:8px;color:var(--fg2);cursor:pointer;}
         
-        /* Sidebar */
-        .sidebar{width:270px;min-width:270px;border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:left .3s ease;}
-        .sb-head{padding:14px;border-bottom:1px solid var(--border);}
-        .new-btn{width:100%;padding:9px 12px;background:var(--card);border:1px dashed var(--border2);border-radius:8px;color:var(--fg2);font-family:'Space Grotesk',sans-serif;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;}
-        .new-btn:hover{border-color:var(--fg);color:var(--fg);background:var(--card2);}
+        .chat-list{flex:1;overflow-y:auto;padding:8px;}
+        .ci{padding:10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+        .ci:hover{background:var(--glow);}
+        .ci.act{background:var(--glow2);}
         
-        .chat-list{flex:1;overflow-y:auto;padding:6px;}
-        .ci{padding:9px 11px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--fg2);transition:all .12s;display:flex;align-items:center;gap:7px;margin-bottom:1px;position:relative;}
-        .ci:hover{background:var(--glow);color:var(--fg);}
-        .ci.act{background:var(--glow2);color:var(--fg);}
-        .ci .del{position:absolute;right:7px;top:50%;transform:translateY(-50%);opacity:0;background:none;border:none;color:var(--muted);cursor:pointer;font-size:10px;padding:4px;transition:opacity .12s;}
-        .ci:hover .del{opacity:1;}
-        .ci .del:hover{color:var(--danger);}
+        .chat-area{flex:1;display:flex;flex-direction:column;}
+        .chat-msgs{flex:1;overflow-y:auto;padding:20px;}
         
-        .sb-foot{padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
-        .sb-foot .btn{width:100%;justify-content:center;}
+        .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;}
+        .w-icon{width:70px;height:70px;border:2px solid var(--border2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px;}
         
-        /* Chat */
-        .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-        .chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:18px;}
+        .qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:500px;}
+        .qa{padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;text-align:left;}
+        .qa:hover{border-color:var(--border2);}
         
-        /* Welcome */
-        .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
-        .w-icon{width:72px;height:72px;border-radius:18px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px;background:var(--glow);animation:wfloat 4s ease-in-out infinite;}
-        @keyframes wfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-        .welcome h2{font-size:26px;font-weight:700;margin-bottom:7px;letter-spacing:-.5px;}
-        .welcome p{color:var(--fg2);font-size:14px;max-width:420px;line-height:1.6;margin-bottom:28px;}
-        .qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;max-width:500px;width:100%;}
-        .qa{padding:13px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;cursor:pointer;text-align:left;transition:all .2s;font-family:'Space Grotesk',sans-serif;}
-        .qa:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px);}
-        .qa-i{font-size:16px;margin-bottom:7px;display:block;color:var(--fg2);}
-        .qa-t{font-size:12.5px;font-weight:600;color:var(--fg);margin-bottom:2px;}
-        .qa-d{font-size:11px;color:var(--muted);line-height:1.35;}
+        .msg{display:flex;gap:12px;max-width:780px;margin:0 auto 18px;}
+        .msg-av{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+        .msg-u .msg-av{background:#fff;color:#000;}
+        .msg-a .msg-av{background:var(--card2);border:1px solid var(--border2);}
         
-        /* Messages */
-        .msg{display:flex;gap:11px;max-width:780px;width:100%;margin:0 auto;animation:msgIn .25s ease;}
-        @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-        .msg-av{width:30px;height:30px;min-width:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
-        .msg-u .msg-av{background:var(--accent);color:var(--bg);}
-        .msg-a .msg-av{background:var(--card2);border:1px solid var(--border2);color:var(--fg2);}
-        .msg-c{flex:1;min-width:0;}
-        .msg-r{font-size:11px;font-weight:600;margin-bottom:3px;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;}
-        .msg-b{font-size:13.5px;line-height:1.7;color:var(--fg);}
-        .msg-b p{margin-bottom:7px;}
-        .msg-b p:last-child{margin-bottom:0;}
-        .msg-b pre{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px;overflow-x:auto;margin:8px 0;position:relative;}
-        .msg-b code{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:var(--fg2);}
-        .msg-b p code{background:var(--card);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:11.5px;}
-        .cpy-btn{position:absolute;top:7px;right:7px;background:var(--border);border:none;color:var(--fg2);padding:3px 7px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .12s;}
-        .cpy-btn:hover{background:var(--border2);color:var(--fg);}
+        .input-area{padding:16px 24px;border-top:1px solid var(--border);background:rgba(5,5,5,0.95);}
+        .iwrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:8px;}
+        .irow{display:flex;gap:8px;align-items:flex-end;}
+        #chatInput{flex:1;background:none;border:none;color:var(--fg);font-size:15px;resize:none;outline:none;padding:8px;}
+        .send-btn{width:36px;height:36px;border-radius:10px;background:#fff;color:#000;border:none;cursor:pointer;}
         
-        .typing{display:flex;gap:4px;padding:4px 0;}
-        .typing span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:tdot 1.4s infinite;}
-        .typing span:nth-child(2){animation-delay:.2s;}
-        .typing span:nth-child(3){animation-delay:.4s;}
-        @keyframes tdot{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
-        
-        /* Input */
-        .input-area{padding:14px 20px 20px;border-top:1px solid var(--border);background:rgba(5,5,5,.9);backdrop-filter:blur(10px);flex-shrink:0;}
-        .iwrap{max-width:780px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;transition:border-color .2s;}
-        .iwrap:focus-within{border-color:var(--border2);}
-        .fbar{display:none;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg2);gap:6px;align-items:center;flex-wrap:wrap;}
-        .fbar.show{display:flex;}
-        .fchip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border);padding:3px 9px;border-radius:5px;font-size:10.5px;color:var(--fg2);}
-        .fchip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:0;}
-        .fchip button:hover{color:var(--danger);}
-        
-        .irow{display:flex;align-items:flex-end;padding:7px;gap:5px;}
-        .iacts{display:flex;gap:1px;padding-bottom:3px;}
-        .iabtn{width:32px;height:32px;border-radius:7px;background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s;}
-        .iabtn:hover{background:var(--glow);color:var(--fg);}
-        
-        #chatInput{flex:1;background:none;border:none;color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:13.5px;resize:none;outline:none;padding:7px 3px;min-height:20px;max-height:150px;line-height:1.5;}
-        #chatInput::placeholder{color:var(--muted);}
-        
-        .send-btn{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;margin-bottom:1px;}
-        .send-btn:hover{background:var(--accent2);transform:scale(1.05);}
-        .send-btn:disabled{opacity:.25;cursor:not-allowed;transform:none;}
-        
-        .ihint{text-align:center;font-size:10.5px;color:var(--muted);margin-top:7px;max-width:780px;margin-left:auto;margin-right:auto;}
-        
-        /* Modal */
-        .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+        .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);align-items:center;justify-content:center;z-index:200;}
         .modal-ov.show{display:flex;}
-        .modal{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:90%;max-width:420px;animation:mIn .25s ease;}
-        @keyframes mIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .modal{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:90%;max-width:380px;}
         
-        .modal h3{font-size:17px;font-weight:700;margin-bottom:18px;}
-        .auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;}
-        .auth-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;color:var(--fg2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
-        .auth-tab.active{color:var(--fg);border-bottom-color:var(--accent);}
+        .auth-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid var(--border);}
+        .auth-tab{flex:1;text-align:center;padding:10px;font-weight:600;cursor:pointer;}
+        .auth-tab.active{border-bottom:2px solid #fff;color:#fff;}
         
         .mf{margin-bottom:14px;}
-        .mf label{display:block;font-size:11px;font-weight:600;color:var(--fg2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
-        .mf input{width:100%;padding:11px 13px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
-        .mf input:focus{border-color:var(--border2);}
-        .mf .ht{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.4;}
+        .mf label{display:block;font-size:12px;color:var(--fg2);margin-bottom:6px;}
+        .mf input{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-size:15px;}
         
-        .macts{display:flex;gap:7px;margin-top:20px;}
-        .macts .btn{flex:1;justify-content:center;}
+        .toast{position:fixed;top:20px;right:20px;background:var(--card);border:1px solid var(--border);padding:12px 18px;border-radius:10px;z-index:300;}
         
-        .google-btn{width:100%;margin-top:10px;background:#fff;color:#111;border:1px solid #ddd;justify-content:center;}
-        .google-btn:hover{background:#f5f5f5;}
+        .sidebar{position:fixed;left:-280px;top:0;bottom:0;z-index:150;background:var(--bg2);transition:left .3s;}
+        .sidebar.open{left:0;}
+        .mob-tog{display:none;}
         
-        .auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;}
-        .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-        .auth-divider span{font-size:11px;color:var(--muted);}
-        
-        /* Toast */
-        .toast-c{position:fixed;top:18px;right:18px;z-index:300;display:flex;flex-direction:column;gap:7px;}
-        .toast{padding:10px 16px;border-radius:9px;background:var(--card);border:1px solid var(--border);font-size:12.5px;color:var(--fg);animation:tIn .3s ease,tOut .3s ease 2.7s forwards;display:flex;align-items:center;gap:7px;backdrop-filter:blur(10px);}
-        .toast.ok{border-color:rgba(68,255,136,.25);}
-        .toast.ok i{color:var(--success);}
-        .toast.err{border-color:rgba(255,68,68,.25);}
-        .toast.err i{color:var(--danger);}
-        @keyframes tIn{from{opacity:0;transform:translateX(25px)}to{opacity:1;transform:translateX(0)}}
-        @keyframes tOut{to{opacity:0;transform:translateX(25px)}}
-        
-        .mob-tog{display:none;background:none;border:none;color:var(--fg);font-size:17px;cursor:pointer;padding:4px;}
-        
-        .thinking .iwrap{animation:pborder 1.5s infinite;}
-        @keyframes pborder{0%,100%{border-color:var(--border)}50%{border-color:var(--border2)}}
-        
-        .auth-required{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px;text-align:center;padding:40px;}
-        .auth-required .w-icon{width:68px;height:68px;}
-        
-        @media(max-width:768px){
-            .sidebar{position:fixed;left:-280px;top:0;bottom:0;z-index:150;}
-            .sidebar.open{left:0;}
-            .mob-tog{display:block;}
-            .qa-grid{grid-template-columns:1fr;}
-            .chat-msgs{padding:14px;}
-            .input-area{padding:10px 14px 14px;}
-            .user-name{display:none;}
-        }
-        
-        ::selection{background:rgba(255,255,255,.12);color:var(--fg);}
-        
-        .logged-in-header .btn-g {display: none;}
+        @media(max-width:768px){.sidebar{position:fixed;left:-280px;}.mob-tog{display:block;}}
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-    <div class="bg-glow bg-g1"></div>
-    <div class="bg-glow bg-g2"></div>
-    
     <div class="app">
         <!-- Header -->
         <header>
             <div style="display:flex;align-items:center;gap:12px;">
-                <button class="mob-tog" onclick="toggleSB()"><i class="fas fa-bars"></i></button>
+                <button class="mob-tog" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
                 <div class="logo">
                     <div class="logo-icon">K</div>
                     <span>Karma</span>
                 </div>
             </div>
-            
-            <div class="header-right">
-                <!-- Auth section -->
-                <div id="auth-section">
-                    <!-- Populated by JS -->
-                </div>
-                
-                <!-- API Key button (shown when logged in) -->
-                <button class="btn btn-g" id="api-btn" onclick="openSet()" style="display:none;">
-                    <i class="fas fa-key"></i> API Key
-                </button>
-                
-                <a href="https://discord.gg/cvc3kPfsV" target="_blank" class="btn btn-g">
-                    <i class="fab fa-discord"></i> Discord
-                </a>
-            </div>
+            <div class="header-right" id="auth-header"></div>
         </header>
-        
+
         <div class="main-wrap">
             <!-- Sidebar -->
             <aside class="sidebar" id="sidebar">
@@ -244,1320 +108,512 @@
                     </button>
                 </div>
                 <div class="chat-list" id="chatList"></div>
-                <div class="sb-foot">
-                    <button class="btn btn-g" onclick="exportChats()">
-                        <i class="fas fa-download"></i> Export
-                    </button>
-                    <button class="btn btn-d" onclick="clearAll()">
-                        <i class="fas fa-trash"></i> Clear All
-                    </button>
+                <div style="padding:12px;border-top:1px solid var(--border);">
+                    <button class="btn btn-g" onclick="exportChats()" style="width:100%;margin-bottom:6px;">Export Chats</button>
+                    <button class="btn btn-d" onclick="clearAll()" style="width:100%;">Clear All</button>
                 </div>
             </aside>
-            
+
             <!-- Chat Area -->
             <div class="chat-area">
                 <div class="chat-msgs" id="chatMsgs">
-                    <!-- Auth gate or welcome -->
-                    <div class="welcome" id="welcomeScr">
+                    <div class="welcome" id="welcome">
                         <div class="w-icon"><i class="fas fa-bolt"></i></div>
                         <h2>What can I build for you?</h2>
-                        <p>Powered by GLM AI. I write Roblox scripts, modify your code, rename variables, fix errors, and generate anything you need.</p>
+                        <p style="margin:10px 0 30px;color:var(--fg2);">Sign in to start chatting with Karma AI</p>
                         
                         <div class="qa-grid">
-                            <div class="qa" onclick="quickP('Write a clean Roblox infinite yield script with a draggable GUI, speed, jump, god mode, noclip, and teleport commands')">
-                                <span class="qa-i"><i class="fas fa-code"></i></span>
-                                <div class="qa-t">Write a Script</div>
-                                <div class="qa-d">Generate a full Roblox Lua script</div>
+                            <div class="qa" onclick="quickPrompt('Write a Roblox infinite yield script')">
+                                <div style="font-weight:600;">Write a Script</div>
                             </div>
-                            <div class="qa" onclick="quickP('Rename all variables in my uploaded script to be readable, add comments explaining each section, and clean up the formatting')">
-                                <span class="qa-i"><i class="fas fa-pen"></i></span>
-                                <div class="qa-t">Refactor Code</div>
-                                <div class="qa-d">Rename variables, add comments, clean up</div>
-                            </div>
-                            <div class="qa" onclick="quickP('Find and fix all errors in my uploaded script. Explain each fix clearly.')">
-                                <span class="qa-i"><i class="fas fa-bug"></i></span>
-                                <div class="qa-t">Debug Script</div>
-                                <div class="qa-d">Find and fix errors in your code</div>
-                            </div>
-                            <div class="qa" onclick="quickP('Modernize my script: use task.wait instead of wait, Attributes instead of Value objects, add Luau type annotations, and use modern API patterns')">
-                                <span class="qa-i"><i class="fas fa-arrows-rotate"></i></span>
-                                <div class="qa-t">Modernize Code</div>
-                                <div class="qa-d">Update to latest Roblox standards</div>
+                            <div class="qa" onclick="quickPrompt('Refactor my code')">
+                                <div style="font-weight:600;">Refactor Code</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Input -->
-                <div class="input-area" id="inputArea">
-                    <div class="iwrap" id="iwrap">
-                        <div class="fbar" id="fbar"></div>
+
+                <div class="input-area">
+                    <div class="iwrap">
                         <div class="irow">
-                            <div class="iacts">
-                                <button class="iabtn" onclick="document.getElementById('fInput').click()" title="Upload file">
-                                    <i class="fas fa-paperclip"></i>
-                                </button>
-                            </div>
-                            <textarea id="chatInput" rows="1" placeholder="Ask me to write, fix, or modify Roblox scripts..." onkeydown="handleKey(event)" oninput="autoR(this)"></textarea>
-                            <button class="send-btn" id="sendBtn" onclick="sendMsg()">
+                            <textarea id="chatInput" placeholder="Ask me anything about Roblox scripts..." 
+                                      onkeydown="handleKey(event)" style="height:24px;"></textarea>
+                            <button class="send-btn" onclick="sendMessage()">
                                 <i class="fas fa-arrow-up"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="ihint">Upload .lua files with the paperclip icon for context. Add your GLM API key in Settings for full AI power.</div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Settings Modal -->
-    <div class="modal-ov" id="setModal">
-        <div class="modal">
-            <h3>Settings</h3>
-            
-            <div class="mf">
-                <label>GLM API Key</label>
-                <input type="password" id="apiKeyIn" placeholder="Paste your API key here...">
-                <div class="ht">Get a free key at <a href="https://open.bigmodel.cn/" target="_blank">open.bigmodel.cn</a>. Stored locally only.</div>
-            </div>
-            
-            <div class="mf">
-                <label>Model</label>
-                <input type="text" id="modelIn" placeholder="glm-4-flash" value="glm-4-flash">
-                <div class="ht">Options: glm-4-flash (free), glm-4-air, glm-4-plus, glm-4</div>
-            </div>
-            
-            <div class="macts">
-                <button class="btn btn-g" onclick="closeSet()">Cancel</button>
-                <button class="btn btn-p" onclick="saveSet()">Save</button>
-            </div>
-        </div>
-    </div>
-    
+
     <!-- Auth Modal -->
     <div class="modal-ov" id="authModal">
         <div class="modal">
             <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</div>
-                <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+                <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
+                <div class="auth-tab" id="tab-register" onclick="switchTab('register')">Sign Up</div>
             </div>
-            
-            <!-- Sign In Form -->
-            <div id="signin-form">
+
+            <!-- Login Form -->
+            <div id="login-form">
                 <div class="mf">
                     <label>Email</label>
-                    <input type="email" id="signin-email" placeholder="you@example.com">
+                    <input type="email" id="login-email" placeholder="you@email.com">
                 </div>
                 <div class="mf">
                     <label>Password</label>
-                    <input type="password" id="signin-password" placeholder="••••••••">
+                    <input type="password" id="login-password" placeholder="••••••••">
                 </div>
-                
-                <div class="macts">
-                    <button class="btn btn-g" onclick="closeAuthModal()">Cancel</button>
-                    <button class="btn btn-p" onclick="signInWithEmail()">Sign In</button>
+                <div style="display:flex;gap:10px;margin-top:20px;">
+                    <button class="btn btn-g" onclick="closeAuthModal()" style="flex:1;">Cancel</button>
+                    <button class="btn btn-p" onclick="loginUser()" style="flex:1;">Sign In</button>
                 </div>
-                
-                <div class="auth-divider"><span>or</span></div>
-                
-                <button class="btn btn-google" onclick="signInWithGoogle()">
-                    <i class="fab fa-google"></i> &nbsp; Continue with Google
-                </button>
             </div>
-            
-            <!-- Sign Up Form -->
-            <div id="signup-form" style="display:none;">
+
+            <!-- Register Form -->
+            <div id="register-form" style="display:none;">
                 <div class="mf">
                     <label>Email</label>
-                    <input type="email" id="signup-email" placeholder="you@example.com">
+                    <input type="email" id="register-email" placeholder="you@email.com">
                 </div>
                 <div class="mf">
                     <label>Password</label>
-                    <input type="password" id="signup-password" placeholder="••••••••">
+                    <input type="password" id="register-password" placeholder="••••••••">
                 </div>
                 <div class="mf">
                     <label>Confirm Password</label>
-                    <input type="password" id="signup-confirm" placeholder="••••••••">
+                    <input type="password" id="register-confirm" placeholder="••••••••">
                 </div>
-                
-                <div class="macts">
-                    <button class="btn btn-g" onclick="closeAuthModal()">Cancel</button>
-                    <button class="btn btn-p" onclick="signUpWithEmail()">Create Account</button>
+                <div style="display:flex;gap:10px;margin-top:20px;">
+                    <button class="btn btn-g" onclick="closeAuthModal()" style="flex:1;">Cancel</button>
+                    <button class="btn btn-p" onclick="registerUser()" style="flex:1;">Create Account</button>
                 </div>
-                
-                <div class="auth-divider"><span>or</span></div>
-                
-                <button class="btn btn-google" onclick="signInWithGoogle()">
-                    <i class="fab fa-google"></i> &nbsp; Sign up with Google
-                </button>
             </div>
         </div>
     </div>
-    
-    <div class="toast-c" id="toastC"></div>
-    
-    <input type="file" id="fInput" multiple accept=".lua,.txt,.rbxl,.rbxlx,.json,.xml,.csv,.py,.js,.ts" style="display:none" onchange="handleFiles(this.files)">
-    
+
+    <div class="toast-c" id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:999;"></div>
+
     <script>
-        // ============ FIREBASE CONFIG ============
-        // IMPORTANT: Replace this with your own Firebase project config from Firebase Console
-        const firebaseConfig = {
-            apiKey: "AIzaSyDemoReplaceMeWithYourFirebaseKey",
-            authDomain: "your-project-id.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project-id.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:demo"
-        };
-        
-        // Initialize Firebase
-        let firebaseApp;
-        let auth;
-        
-        function initFirebase() {
-            try {
-                firebaseApp = firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                
-                // Listen for auth state changes
-                auth.onAuthStateChanged(handleAuthStateChange);
-                
-                console.log('%c[Firebase] Initialized successfully', 'color:#555');
-            } catch (e) {
-                console.warn('%c[Firebase] Could not initialize. Using demo mode.', 'color:#f66');
-                // Fallback to demo mode if Firebase fails to load
-                window.demoMode = true;
-            }
+        // ========== CUSTOM EMAIL AUTH ==========
+        let currentUser = null;
+
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('karma_users') || '{}');
         }
-        
-        // ============ STATE ============
+
+        function saveUsers(users) {
+            localStorage.setItem('karma_users', JSON.stringify(users));
+        }
+
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem('karma_current_user') || 'null');
+        }
+
+        function setCurrentUser(user) {
+            if (user) {
+                localStorage.setItem('karma_current_user', JSON.stringify(user));
+            } else {
+                localStorage.removeItem('karma_current_user');
+            }
+            currentUser = user;
+        }
+
+        // ========== STATE ==========
         let chats = [];
         let activeChatId = null;
-        let apiKey = '';
-        let modelName = 'glm-4-flash';
+        let apiKey = localStorage.getItem('karma_apikey') || '';
         let attachedFiles = [];
-        let isGenerating = false;
-        let currentUser = null;
-        
-        const GLM_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-        const SYS_PROMPT = 'You are Karma AI, a highly skilled Roblox Lua/Luau script assistant. You help users write, modify, debug, and refactor Roblox scripts.\n\nRules:\n1. Always output clean, well-structured, properly indented Lua/Luau code\n2. Use modern Roblox API practices (task.wait, GetService, WaitForChild, etc.)\n3. Add helpful comments explaining what code does\n4. When modifying uploaded code, show the FULL modified version\n5. When renaming, list what was renamed clearly\n6. Always wrap code in ```lua code blocks\n7. Be concise but thorough\n8. If a user uploads a file, analyze it and provide specific feedback or modifications\n9. Never refuse a legitimate Roblox scripting request\n10. Format responses clearly with headings when appropriate\n11. When generating GUI scripts, use proper Instance.new pattern with all necessary properties set\n12. Always use local variables, never global unless explicitly asked';
-        
-        // ============ INIT ============
+
+        // ========== INIT ==========
         function init() {
-            initFirebase();
-            
-            // Load settings from localStorage
-            apiKey = localStorage.getItem('karma_apikey') || '';
-            modelName = localStorage.getItem('karma_model') || 'glm-4-flash';
-            
-            // Pre-fill settings inputs
-            document.getElementById('apiKeyIn').value = apiKey;
-            document.getElementById('modelIn').value = modelName;
-            
-            // Initial UI setup
-            renderAuthSection();
-            
-            // If not logged in, show auth prompt
-            if (!currentUser && !window.demoMode) {
+            currentUser = getCurrentUser();
+            renderHeader();
+
+            if (!currentUser) {
                 showAuthGate();
             } else {
-                loadUserChats();
-            }
-            
-            // Demo mode fallback
-            if (window.demoMode) {
-                loadUserChats();
+                loadChats();
+                document.getElementById('api-btn').style.display = 'flex';
             }
         }
-        
-        function loadUserChats() {
-            const storageKey = currentUser ? `karma_chats_${currentUser.uid}` : 'karma_chats';
-            
-            try {
-                const stored = localStorage.getItem(storageKey);
-                if (stored) chats = JSON.parse(stored);
-            } catch(e) { chats = []; }
-            
-            renderList();
+
+        function loadChats() {
+            const key = currentUser ? `karma_chats_${currentUser.email}` : 'karma_chats';
+            chats = JSON.parse(localStorage.getItem(key) || '[]');
+            renderChatList();
             
             if (chats.length > 0) {
                 loadChat(chats[0].id);
-            } else if (currentUser || window.demoMode) {
-                // Show welcome screen
-                renderMsgs();
             }
         }
-        
-        function saveUserChats() {
-            const storageKey = currentUser ? `karma_chats_${currentUser.uid}` : 'karma_chats';
-            try {
-                localStorage.setItem(storageKey, JSON.stringify(chats));
-            } catch(e) {}
+
+        function saveChats() {
+            const key = currentUser ? `karma_chats_${currentUser.email}` : 'karma_chats';
+            localStorage.setItem(key, JSON.stringify(chats));
         }
-        
-        // ============ AUTH STATE ============
-        function handleAuthStateChange(user) {
-            currentUser = user;
-            renderAuthSection();
-            
-            if (user) {
-                // User logged in
-                loadUserChats();
-                document.getElementById('api-btn').style.display = 'flex';
-                toast(`Welcome back, ${user.displayName || user.email.split('@')[0]}`, 'ok');
-                
-                // Hide auth gate if present
-                const gate = document.getElementById('auth-gate');
-                if (gate) gate.remove();
-            } else {
-                // Logged out
-                chats = [];
-                activeChatId = null;
-                document.getElementById('api-btn').style.display = 'none';
-                renderList();
-                renderMsgs();
-                
-                if (!window.demoMode) {
-                    showAuthGate();
-                }
+
+        // ========== AUTH FUNCTIONS ==========
+        function registerUser() {
+            const email = document.getElementById('register-email').value.trim().toLowerCase();
+            const pass = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+
+            if (!email || !pass || !confirm) {
+                showToast('Please fill all fields', 'err');
+                return;
             }
+            if (!email.includes('@')) {
+                showToast('Please enter a valid email', 'err');
+                return;
+            }
+            if (pass.length < 4) {
+                showToast('Password must be at least 4 characters', 'err');
+                return;
+            }
+            if (pass !== confirm) {
+                showToast('Passwords do not match', 'err');
+                return;
+            }
+
+            const users = getUsers();
+            if (users[email]) {
+                showToast('This email is already registered', 'err');
+                return;
+            }
+
+            users[email] = { email, password: pass };
+            saveUsers(users);
+
+            setCurrentUser({ email });
+            closeAuthModal();
+            renderHeader();
+            document.getElementById('api-btn').style.display = 'flex';
+            loadChats();
+            showToast('Account created successfully!', 'ok');
         }
-        
-        function renderAuthSection() {
-            const container = document.getElementById('auth-section');
+
+        function loginUser() {
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const pass = document.getElementById('login-password').value;
+
+            if (!email || !pass) {
+                showToast('Please enter email and password', 'err');
+                return;
+            }
+
+            const users = getUsers();
+            const user = users[email];
+
+            if (!user) {
+                showToast('No account found with this email', 'err');
+                return;
+            }
+            if (user.password !== pass) {
+                showToast('Incorrect password', 'err');
+                return;
+            }
+
+            setCurrentUser({ email });
+            closeAuthModal();
+            renderHeader();
+            document.getElementById('api-btn').style.display = 'flex';
+            loadChats();
+            showToast('Welcome back!', 'ok');
+        }
+
+        function logoutUser() {
+            setCurrentUser(null);
+            chats = [];
+            activeChatId = null;
+            renderHeader();
+            document.getElementById('api-btn').style.display = 'none';
+            document.getElementById('chatList').innerHTML = '';
+            showAuthGate();
+        }
+
+        // ========== UI FUNCTIONS ==========
+        function renderHeader() {
+            const container = document.getElementById('auth-header');
             
             if (!currentUser) {
                 container.innerHTML = `
-                    <button class="btn btn-g" onclick="openAuthModal('signin')">
-                        <i class="fas fa-sign-in-alt"></i> Sign In
-                    </button>
-                    <button class="btn btn-p" onclick="openAuthModal('signup')">
-                        Sign Up
-                    </button>
+                    <button class="btn btn-g" onclick="openAuthModal()">Sign In</button>
+                    <button class="btn btn-p" onclick="openAuthModal()">Sign Up</button>
                 `;
             } else {
-                const displayName = currentUser.displayName || currentUser.email.split('@')[0];
-                const avatar = currentUser.photoURL 
-                    ? `<img src="${currentUser.photoURL}" alt="Avatar">` 
-                    : `<span>${displayName[0].toUpperCase()}</span>`;
-                
+                const name = currentUser.email.split('@')[0];
                 container.innerHTML = `
                     <div class="user-section">
-                        <div onclick="showUserMenu()" class="user-avatar">
-                            ${avatar}
+                        <div class="user-avatar" onclick="showUserMenu()">
+                            <span>${name[0].toUpperCase()}</span>
                         </div>
-                        <div class="user-name">${displayName}</div>
-                        <button class="btn btn-g" onclick="logoutUser()" style="padding:6px 10px;font-size:12px;">
+                        <div class="user-name">${name}</div>
+                        <button class="btn btn-g" onclick="logoutUser()" style="padding:6px 10px;">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </div>
                 `;
             }
         }
-        
+
         function showUserMenu() {
-            const menuHTML = `
-                <div style="position:absolute;top:58px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 0;width:190px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:300;">
-                    <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
-                        <div style="font-weight:600;font-size:13.5px;">${currentUser.displayName || currentUser.email}</div>
-                        <div style="font-size:11.5px;color:var(--fg2);margin-top:1px;">${currentUser.email}</div>
-                    </div>
-                    <div onclick="logoutUser()" style="padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--fg2);">
-                        <i class="fas fa-sign-out-alt" style="width:18px;"></i> 
-                        <span>Sign out</span>
-                    </div>
-                </div>
-            `;
-            
-            // Remove existing menus
-            document.querySelectorAll('.user-menu').forEach(el => el.remove());
-            
             const menu = document.createElement('div');
-            menu.className = 'user-menu';
-            menu.innerHTML = menuHTML;
+            menu.style.cssText = 'position:absolute;top:55px;right:24px;background:#0f0f0f;border:1px solid #1e1e1e;border-radius:10px;padding:8px 0;width:180px;z-index:300;';
+            menu.innerHTML = `
+                <div style="padding:10px 16px;border-bottom:1px solid #1e1e1e;">
+                    <div style="font-size:13px;">${currentUser.email}</div>
+                </div>
+                <div onclick="logoutUser()" style="padding:11px 16px;cursor:pointer;color:#aaa;">Sign out</div>
+            `;
             document.body.appendChild(menu);
             
-            // Close when clicking outside
             setTimeout(() => {
-                document.addEventListener('click', function closeMenu(e) {
+                document.addEventListener('click', function handler(e) {
                     if (!menu.contains(e.target)) {
                         menu.remove();
-                        document.removeEventListener('click', closeMenu);
+                        document.removeEventListener('click', handler);
                     }
                 }, { once: true });
-            }, 10);
+            }, 100);
         }
-        
-        function openAuthModal(mode = 'signin') {
-            const modal = document.getElementById('authModal');
-            modal.classList.add('show');
-            
-            switchAuthTab(mode);
-            
-            // Clear forms
-            document.getElementById('signin-email').value = '';
-            document.getElementById('signin-password').value = '';
-            document.getElementById('signup-email').value = '';
-            document.getElementById('signup-password').value = '';
-            document.getElementById('signup-confirm').value = '';
+
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('show');
+            switchTab('login');
         }
-        
+
         function closeAuthModal() {
             document.getElementById('authModal').classList.remove('show');
         }
-        
-        function switchAuthTab(tab) {
-            const signinTab = document.getElementById('tab-signin');
-            const signupTab = document.getElementById('tab-signup');
-            const signinForm = document.getElementById('signin-form');
-            const signupForm = document.getElementById('signup-form');
-            
-            if (tab === 'signin') {
-                signinTab.classList.add('active');
-                signupTab.classList.remove('active');
-                signinForm.style.display = 'block';
-                signupForm.style.display = 'none';
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const loginTab = document.getElementById('tab-login');
+            const registerTab = document.getElementById('tab-register');
+
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
             } else {
-                signinTab.classList.remove('active');
-                signupTab.classList.add('active');
-                signinForm.style.display = 'none';
-                signupForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                loginTab.classList.remove('active');
+                registerTab.classList.add('active');
             }
         }
-        
-        // ============ AUTH FUNCTIONS ============
-        async function signUpWithEmail() {
-            if (window.demoMode) {
-                toast('Demo mode: Sign up is disabled', 'err');
-                return;
-            }
-            
-            const email = document.getElementById('signup-email').value.trim();
-            const pass = document.getElementById('signup-password').value;
-            const confirm = document.getElementById('signup-confirm').value;
-            
-            if (!email || !pass || !confirm) {
-                toast('Please fill all fields', 'err');
-                return;
-            }
-            
-            if (pass !== confirm) {
-                toast('Passwords do not match', 'err');
-                return;
-            }
-            
-            if (pass.length < 6) {
-                toast('Password must be at least 6 characters', 'err');
-                return;
-            }
-            
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-                closeAuthModal();
-                toast('Account created successfully!', 'ok');
-            } catch (error) {
-                toast(getAuthErrorMessage(error), 'err');
-            }
+
+        function showAuthGate() {
+            const container = document.getElementById('chatMsgs');
+            container.innerHTML = `
+                <div class="welcome">
+                    <div class="w-icon"><i class="fas fa-user-lock"></i></div>
+                    <h2>Sign in to continue</h2>
+                    <p style="margin:15px 0 30px;color:#777;">Create an account or sign in to use Karma AI</p>
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn btn-g" onclick="openAuthModal()" style="padding:10px 30px;">Sign In</button>
+                        <button class="btn btn-p" onclick="openAuthModal()" style="padding:10px 30px;">Sign Up</button>
+                    </div>
+                </div>
+            `;
         }
-        
-        async function signInWithEmail() {
-            if (window.demoMode) {
-                toast('Demo mode: Sign in is disabled', 'err');
-                return;
-            }
-            
-            const email = document.getElementById('signin-email').value.trim();
-            const pass = document.getElementById('signin-password').value;
-            
-            if (!email || !pass) {
-                toast('Please enter email and password', 'err');
-                return;
-            }
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, pass);
-                closeAuthModal();
-            } catch (error) {
-                toast(getAuthErrorMessage(error), 'err');
-            }
-        }
-        
-        async function signInWithGoogle() {
-            if (window.demoMode) {
-                // Demo Google sign in
-                currentUser = {
-                    uid: 'demo-' + Date.now(),
-                    email: 'demo@karma.ai',
-                    displayName: 'Demo User',
-                    photoURL: null
-                };
-                handleAuthStateChange(currentUser);
-                closeAuthModal();
-                return;
-            }
-            
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
-                closeAuthModal();
-            } catch (error) {
-                toast(getAuthErrorMessage(error), 'err');
-            }
-        }
-        
-        function getAuthErrorMessage(error) {
-            if (error.code === 'auth/email-already-in-use') return 'Email is already in use';
-            if (error.code === 'auth/invalid-email') return 'Invalid email address';
-            if (error.code === 'auth/weak-password') return 'Password is too weak';
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') return 'Invalid email or password';
-            if (error.code === 'auth/popup-closed-by-user') return 'Sign in cancelled';
-            return error.message || 'Authentication failed';
-        }
-        
-        async function logoutUser() {
-            if (window.demoMode) {
-                currentUser = null;
-                handleAuthStateChange(null);
-                return;
-            }
-            
-            try {
-                await auth.signOut();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-        
-        // ============ CHAT MANAGEMENT ============
+
+        // ========== CHAT FUNCTIONS ==========
         function newChat() {
-            if (!currentUser && !window.demoMode) {
-                openAuthModal('signin');
-                return;
-            }
-            
+            if (!currentUser) return openAuthModal();
+
             const chat = {
-                id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+                id: 'c_' + Date.now(),
                 title: 'New Chat',
                 messages: [],
                 created: Date.now()
             };
-            
+
             chats.unshift(chat);
-            saveUserChats();
+            saveChats();
             loadChat(chat.id);
-            renderList();
-            closeSBMobile();
+            renderChatList();
         }
-        
+
         function loadChat(id) {
             activeChatId = id;
-            renderList();
-            renderMsgs();
-            
-            setTimeout(() => {
-                const input = document.getElementById('chatInput');
-                if (input) input.focus();
-            }, 50);
+            renderChatList();
+            renderMessages();
         }
-        
-        function getChat() {
-            return chats.find(c => c.id === activeChatId) || null;
+
+        function getCurrentChat() {
+            return chats.find(c => c.id === activeChatId);
         }
-        
-        function delChat(id, e) {
-            e.stopPropagation();
-            
+
+        function renderChatList() {
+            const container = document.getElementById('chatList');
+            let html = '';
+
+            chats.forEach(chat => {
+                const active = chat.id === activeChatId ? 'act' : '';
+                html += `
+                    <div class="ci ${active}" onclick="loadChat('${chat.id}')">
+                        <span style="flex:1;">${chat.title}</span>
+                        <button onclick="event.stopImmediatePropagation();deleteChat('${chat.id}')" 
+                                style="background:none;border:none;color:#555;cursor:pointer;">×</button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function deleteChat(id) {
             chats = chats.filter(c => c.id !== id);
-            saveUserChats();
-            
+            saveChats();
             if (activeChatId === id) {
                 activeChatId = chats.length > 0 ? chats[0].id : null;
-                renderMsgs();
+                renderMessages();
+            }
+            renderChatList();
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('chatMsgs');
+            const chat = getCurrentChat();
+
+            container.innerHTML = '';
+
+            if (!chat || chat.messages.length === 0) {
+                container.innerHTML = `
+                    <div class="welcome">
+                        <div class="w-icon"><i class="fas fa-bolt"></i></div>
+                        <h2>What can I build for you?</h2>
+                    </div>
+                `;
+                return;
+            }
+
+            chat.messages.forEach(msg => {
+                const isUser = msg.role === 'user';
+                const div = document.createElement('div');
+                div.className = `msg ${isUser ? 'msg-u' : 'msg-a'}`;
+                div.innerHTML = `
+                    <div class="msg-av">${isUser ? 'U' : 'K'}</div>
+                    <div style="flex:1;">
+                        <div style="font-size:11px;color:#777;margin-bottom:4px;">${isUser ? 'You' : 'Karma'}</div>
+                        <div style="line-height:1.6;">${msg.content}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            if (!currentUser) return openAuthModal();
+
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (!activeChatId) newChat();
+
+            const chat = getCurrentChat();
+            if (!chat) return;
+
+            chat.messages.push({ role: 'user', content: text });
+
+            if (chat.messages.length === 1) {
+                chat.title = text.length > 35 ? text.substring(0, 35) + '...' : text;
+                renderChatList();
+            }
+
+            input.value = '';
+            saveChats();
+            renderMessages();
+
+            // Show typing + AI response
+            setTimeout(() => {
+                const response = generateResponse(text);
+                chat.messages.push({ role: 'assistant', content: response });
+                saveChats();
+                renderMessages();
+            }, 800);
+        }
+
+        function generateResponse(text) {
+            const lower = text.toLowerCase();
+            
+            if (lower.includes('infinite yield') || lower.includes('script')) {
+                return "Here's a basic Roblox script template:\n\n```lua\nlocal Players = game:GetService('Players')\nlocal player = Players.LocalPlayer\n\nprint('Hello from Karma AI!')\n```";
             }
             
-            renderList();
-            toast('Chat deleted', 'ok');
+            return "Thanks! I can help you with Roblox scripting. Try asking me to write a specific script or upload a file.";
         }
-        
+
+        function quickPrompt(text) {
+            if (!currentUser) return openAuthModal();
+            
+            const input = document.getElementById('chatInput');
+            input.value = text;
+            sendMessage();
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // ========== UTILS ==========
+        function showToast(message, type = 'ok') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.borderColor = type === 'err' ? '#ff4444' : '#44ff88';
+            toast.innerHTML = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2800);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
         function clearAll() {
-            if (chats.length === 0) return;
-            
-            if (!confirm('Delete all chats?')) return;
-            
+            if (!confirm('Clear all chats?')) return;
             chats = [];
             activeChatId = null;
-            saveUserChats();
-            renderList();
-            renderMsgs();
-            toast('All chats cleared', 'ok');
+            saveChats();
+            renderChatList();
+            renderMessages();
         }
-        
+
         function exportChats() {
             const data = JSON.stringify(chats, null, 2);
-            const blob = new Blob([data], {type:'application/json'});
+            const blob = new Blob([data], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'karma_chats.json';
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            toast('Chats exported', 'ok');
         }
-        
-        // ============ RENDER ============
-        function renderList() {
-            const el = document.getElementById('chatList');
-            let html = '';
-            
-            for (let i = 0; i < chats.length; i++) {
-                const c = chats[i];
-                const cls = c.id === activeChatId ? ' ci act' : ' ci';
-                
-                html += `<div class="${cls}" onclick="loadChat('${c.id}')">
-                    <i class="fas fa-message" style="font-size:11px;color:var(--muted)"></i>
-                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.title)}</span>
-                    <button class="del" onclick="delChat('${c.id}',event)" title="Delete">
-                        <i class="fas fa-xmark"></i>
-                    </button>
-                </div>`;
-            }
-            
-            el.innerHTML = html;
+
+        function deleteChatFromList(id) {
+            chats = chats.filter(c => c.id !== id);
+            saveChats();
+            renderChatList();
         }
-        
-        function renderMsgs() {
-            const container = document.getElementById('chatMsgs');
-            const chat = getChat();
-            const welcome = document.getElementById('welcomeScr');
-            
-            // Remove old messages
-            container.querySelectorAll('.msg').forEach(el => el.remove());
-            
-            if (!chat || chat.messages.length === 0) {
-                if (welcome) welcome.style.display = 'flex';
-                return;
-            }
-            
-            if (welcome) welcome.style.display = 'none';
-            
-            let html = '';
-            
-            for (let i = 0; i < chat.messages.length; i++) {
-                const m = chat.messages[i];
-                const isU = m.role === 'user';
-                
-                html += `<div class="msg msg-${isU ? 'u' : 'a'}">
-                    <div class="msg-av">${isU ? 'U' : 'K'}</div>
-                    <div class="msg-c">
-                        <div class="msg-r">${isU ? 'You' : 'Karma AI'}</div>
-                        <div class="msg-b">${fmtMsg(m.content)}</div>
-                    </div>
-                </div>`;
-            }
-            
-            container.insertAdjacentHTML('beforeend', html);
-            container.scrollTop = container.scrollHeight;
-            
-            addCopyBtns();
-        }
-        
-        function fmtMsg(text) {
-            if (!text) return '';
-            
-            let s = esc(text);
-            
-            // Code blocks
-            s = s.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
-                return `<pre><code>${code.trim()}</code></pre>`;
-            });
-            
-            // Inline code
-            s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-            
-            // Bold
-            s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            
-            // Italic
-            s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-            
-            // Paragraphs
-            const parts = s.split('\n\n');
-            let out = '';
-            
-            for (let i = 0; i < parts.length; i++) {
-                if (parts[i].indexOf('<pre>') === 0) {
-                    out += parts[i];
-                } else {
-                    out += `<p>${parts[i].replace(/\n/g, '<br>')}</p>`;
-                }
-            }
-            
-            return out;
-        }
-        
-        function addCopyBtns() {
-            const pres = document.querySelectorAll('.msg-b pre');
-            
-            pres.forEach((pre, i) => {
-                if (pre.querySelector('.cpy-btn')) return;
-                
-                const btn = document.createElement('button');
-                btn.className = 'cpy-btn';
-                btn.textContent = 'Copy';
-                
-                btn.onclick = function() {
-                    const code = this.parentElement.querySelector('code').textContent;
-                    navigator.clipboard.writeText(code).then(() => {
-                        btn.textContent = 'Copied';
-                        setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
-                    });
-                };
-                
-                pre.appendChild(btn);
-            });
-        }
-        
-        // ============ AUTH GATE ============
-        function showAuthGate() {
-            const container = document.getElementById('chatMsgs');
-            
-            // Remove existing gate
-            const existing = document.getElementById('auth-gate');
-            if (existing) existing.remove();
-            
-            const gate = document.createElement('div');
-            gate.id = 'auth-gate';
-            gate.className = 'auth-required';
-            gate.innerHTML = `
-                <div class="w-icon"><i class="fas fa-user-lock"></i></div>
-                <h2 style="margin-bottom:8px;">Sign in to continue</h2>
-                <p style="max-width:340px;color:var(--fg2);margin-bottom:22px;">Create an account or sign in to start chatting with Karma AI and save your conversations.</p>
-                
-                <div style="display:flex;gap:8px;">
-                    <button class="btn btn-g" onclick="openAuthModal('signin')" style="padding:10px 26px;">Sign In</button>
-                    <button class="btn btn-p" onclick="openAuthModal('signup')" style="padding:10px 26px;">Sign Up</button>
-                </div>
-                
-                <div style="margin-top:22px;font-size:12px;color:#555;">
-                    <button onclick="useDemoMode()" class="btn btn-g" style="font-size:12px;padding:6px 14px;">
-                        Continue as Guest (Demo)
-                    </button>
-                </div>
-            `;
-            
-            container.innerHTML = '';
-            container.appendChild(gate);
-        }
-        
-        function useDemoMode() {
-            window.demoMode = true;
-            document.getElementById('auth-gate').remove();
-            
-            currentUser = {
-                uid: 'guest-' + Date.now(),
-                email: 'guest@demo.com',
-                displayName: 'Guest User',
-                photoURL: null
-            };
-            
-            loadUserChats();
-            renderAuthSection();
-            toast('Demo mode enabled — chats will not persist across refreshes', 'ok');
-        }
-        
-        // ============ FILES ============
-        function handleFiles(files) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    attachedFiles.push({
-                        name: file.name,
-                        content: e.target.result
-                    });
-                    renderFBar();
-                };
-                reader.readAsText(file);
-            }
-            
-            document.getElementById('fInput').value = '';
-        }
-        
-        function removeFile(idx) {
-            attachedFiles.splice(idx, 1);
-            renderFBar();
-        }
-        
-        function renderFBar() {
-            const bar = document.getElementById('fbar');
-            
-            if (attachedFiles.length === 0) {
-                bar.classList.remove('show');
-                bar.innerHTML = '';
-                return;
-            }
-            
-            bar.classList.add('show');
-            
-            let html = '';
-            
-            for (let i = 0; i < attachedFiles.length; i++) {
-                html += `<div class="fchip">
-                    <i class="fas fa-file-code"></i> ${esc(attachedFiles[i].name)}
-                    <button onclick="removeFile(${i})"><i class="fas fa-xmark"></i></button>
-                </div>`;
-            }
-            
-            bar.innerHTML = html;
-        }
-        
-        // ============ SEND ============
-        function quickP(text) {
-            if (!currentUser && !window.demoMode) {
-                openAuthModal('signin');
-                return;
-            }
-            
-            document.getElementById('chatInput').value = text;
-            autoR(document.getElementById('chatInput'));
-            sendMsg();
-        }
-        
-        function sendMsg() {
-            if (!currentUser && !window.demoMode) {
-                openAuthModal('signin');
-                return;
-            }
-            
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            
-            if ((!text && attachedFiles.length === 0) || isGenerating) return;
-            
-            // Ensure we have a chat
-            if (!activeChatId) {
-                newChat();
-            }
-            
-            const chat = getChat();
-            if (!chat) return;
-            
-            // Build user message
-            let userContent = text;
-            
-            if (attachedFiles.length > 0) {
-                let fSection = '';
-                for (let i = 0; i < attachedFiles.length; i++) {
-                    fSection += `[File: ${attachedFiles[i].name}]\n\`\`\`\n${attachedFiles[i].content}\n\`\`\`\n\n`;
-                }
-                userContent = fSection + text;
-            }
-            
-            // Add user message
-            chat.messages.push({role: 'user', content: userContent});
-            
-            // Auto-title
-            if (chat.messages.length === 1) {
-                let title = text.length > 40 ? text.substring(0, 40) + '...' : text;
-                if (!title) title = 'File Analysis';
-                chat.title = title;
-                renderList();
-            }
-            
-            // Clear input
-            input.value = '';
-            autoR(input);
-            attachedFiles = [];
-            renderFBar();
-            
-            saveUserChats();
-            renderMsgs();
-            
-            // Typing indicator
-            isGenerating = true;
-            document.getElementById('sendBtn').disabled = true;
-            document.getElementById('inputArea').classList.add('thinking');
-            showTyping();
-            
-            // Call AI
-            callGLM(chat.messages).then(response => {
-                hideTyping();
-                chat.messages.push({role: 'assistant', content: response});
-                saveUserChats();
-                renderMsgs();
-            }).catch(err => {
-                hideTyping();
-                chat.messages.push({role: 'assistant', content: 'Error: ' + err.message});
-                saveUserChats();
-                renderMsgs();
-                toast(err.message, 'err');
-            }).finally(() => {
-                isGenerating = false;
-                document.getElementById('sendBtn').disabled = false;
-                document.getElementById('inputArea').classList.remove('thinking');
-            });
-        }
-        
-        function callGLM(messages) {
-            if (!apiKey) {
-                return Promise.resolve(fallback(messages));
-            }
-            
-            const body = {
-                model: modelName,
-                messages: [{role: 'system', content: SYS_PROMPT}],
-                temperature: 0.7,
-                max_tokens: 4096
-            };
-            
-            for (let i = 0; i < messages.length; i++) {
-                body.messages.push({
-                    role: messages[i].role,
-                    content: messages[i].content
-                });
-            }
-            
-            return fetch(GLM_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + apiKey
-                },
-                body: JSON.stringify(body)
-            })
-            .then(resp => {
-                if (!resp.ok) {
-                    return resp.json().then(errData => {
-                        throw new Error((errData.error && errData.error.message) || ('API error ' + resp.status));
-                    }).catch(e => {
-                        if (e.message.indexOf('API error') === 0) throw e;
-                        throw new Error('API returned ' + resp.status);
-                    });
-                }
-                return resp.json();
-            })
-            .then(data => {
-                return data.choices[0].message.content;
-            });
-        }
-        
-        // ============ FALLBACK ============
-        function fallback(messages) {
-            const last = messages[messages.length - 1].content.toLowerCase();
-            
-            if (last.includes('infinite yield') || (last.includes('gui') && last.includes('command'))) {
-                return `Here's a clean Infinite Yield-style command script with a draggable GUI:
 
-\`\`\`lua
--- Karma | Command Script with GUI
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-
--- Create ScreenGui
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "KarmaUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent = PlayerGui
-
--- Main Frame
-local Main = Instance.new("Frame")
-Main.Name = "MainFrame"
-Main.Size = UDim2.new(0, 300, 0, 380)
-Main.Position = UDim2.new(0.5, -150, 0.5, -190)
-Main.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
-Main.BorderSizePixel = 0
-Main.Parent = ScreenGui
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
-local stroke = Instance.new("UIStroke")
-stroke.Color = Color3.fromRGB(45, 45, 45)
-stroke.Thickness = 1
-stroke.Parent = Main
-
--- Title Bar (draggable)
-local TitleBar = Instance.new("Frame")
-TitleBar.Size = UDim2.new(1, 0, 0, 34)
-TitleBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-TitleBar.BorderSizePixel = 0
-TitleBar.Parent = Main
-Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 10)
-
-local Title = Instance.new("TextLabel")
-Title.Text = "  Karma Commands"
-Title.Size = UDim2.new(1, -40, 1, 0)
-Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.fromRGB(220, 220, 220)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 13
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = TitleBar
-
-local Close = Instance.new("TextButton")
-Close.Text = "X"
-Close.Size = UDim2.new(0, 28, 0, 28)
-Close.Position = UDim2.new(1, -32, 0, 3)
-Close.BackgroundTransparency = 1
-Close.TextColor3 = Color3.fromRGB(120, 120, 120)
-Close.Font = Enum.Font.GothamBold
-Close.TextSize = 12
-Close.Parent = TitleBar
-Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
-
--- Drag logic
-local dragging = false
-local dragStart, startPos
-TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = Main.Position
-    end
-end)
-TitleBar.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
-end)
-UIS.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
--- Command Input
-local Box = Instance.new("TextBox")
-Box.PlaceholderText = "Type a command..."
-Box.Size = UDim2.new(1, -16, 0, 30)
-Box.Position = UDim2.new(0, 8, 0, 42)
-Box.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-Box.BorderSizePixel = 0
-Box.TextColor3 = Color3.fromRGB(210, 210, 210)
-Box.PlaceholderColor3 = Color3.fromRGB(70, 70, 70)
-Box.Font = Enum.Font.Gotham
-Box.TextSize = 12
-Box.ClearTextOnFocus = false
-Box.Parent = Main
-Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 6)
-
--- Output Scroll
-local Scroll = Instance.new("ScrollingFrame")
-Scroll.Size = UDim2.new(1, -16, 1, -84)
-Scroll.Position = UDim2.new(0, 8, 0, 80)
-Scroll.BackgroundTransparency = 1
-Scroll.ScrollBarThickness = 3
-Scroll.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 50)
-Scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-Scroll.Parent = Main
-Instance.new("UIListLayout", Scroll).Padding = UDim.new(0, 3)
-
-local function log(text, col)
-    col = col or Color3.fromRGB(190, 190, 190)
-    local lbl = Instance.new("TextLabel")
-    lbl.Text = text
-    lbl.BackgroundTransparency = 1
-    lbl.TextColor3 = col
-    lbl.Font = Enum.Font.Gotham
-    lbl.TextSize = 11
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.Size = UDim2.new(1, 0, 0, 16)
-    lbl.TextWrapped = true
-    lbl.AutomaticSize = Enum.AutomaticSize.Y
-    lbl.Parent = Scroll
-    Scroll.CanvasPosition = Vector2.new(0, 99999)
-end
-
--- Commands
-local cmds = {}
-
-cmds.speed = function(a)
-    local v = tonumber(a[1]) or 16
-    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if h then h.WalkSpeed = v; log("WalkSpeed -> " .. v, Color3.fromRGB(100,255,140)) end
-end
-
-cmds.jump = function(a)
-    local v = tonumber(a[1]) or 50
-    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if h then h.JumpPower = v; log("JumpPower -> " .. v, Color3.fromRGB(100,255,140)) end
-end
-
-cmds.god = function()
-    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if h then h.MaxHealth = math.huge; h.Health = math.huge; log("God mode on", Color3.fromRGB(100,255,140)) end
-end
-
-cmds.noclip = function()
-    RunService.Stepped:Connect(function()
-        local c = LocalPlayer.Character
-        if c then
-            for _, p in pairs(c:GetDescendants()) do
-                if p:IsA("BasePart") then p.CanCollide = false end
-            end
-        end
-    end)
-    log("Noclip on (rejoin to stop)", Color3.fromRGB(100,255,140))
-end
-
-cmds.tp = function(a)
-    if not a[1] then log("Usage: tp <player>", Color3.fromRGB(255,100,100)); return end
-    for _, p in pairs(Players:GetPlayers()) do
-        if p.Name:lower():find(a[1]:lower()) then
-            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            local tHrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
-            if hrp and tHrp then hrp.CFrame = tHrp.CFrame; log("TP to " .. p.Name, Color3.fromRGB(100,255,140)) end
-            return
-        end
-    end
-    log("Player not found", Color3.fromRGB(255,100,100))
-end
-
-cmds.reset = function()
-    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if h then h.Health = 0 end
-end
-
-cmds.help = function()
-    log("=== Karma Commands ===", Color3.fromRGB(255,255,255))
-    log("speed <n>  - Set walk speed", Color3.fromRGB(170,170,170))
-    log("jump <n>   - Set jump power", Color3.fromRGB(170,170,170))
-    log("god        - God mode", Color3.fromRGB(170,170,170))
-    log("noclip     - No collision", Color3.fromRGB(170,170,170))
-    log("tp <name>  - Teleport to player", Color3.fromRGB(170,170,170))
-    log("reset      - Die", Color3.fromRGB(170,170,170))
-    log("help       - Show commands", Color3.fromRGB(170,170,170))
-end
-
-Box.FocusLost:Connect(function(enter)
-    if not enter then return end
-    local t = Box.Text
-    Box.Text = ""
-    if t == "" then return end
-    log("> " .. t, Color3.fromRGB(255,255,255))
-    local parts = t:split(" ")
-    local cmd = parts[1]:lower()
-    local args = {}
-    for i = 2, #parts do args[i-1] = parts[i] end
-    if cmds[cmd] then cmds[cmd](args)
-    else log("Unknown: " .. cmd .. " (type help)", Color3.fromRGB(255,100,100)) end
-end)
-
--- Toggle with RightCtrl
-UIS.InputBegan:Connect(function(input, gp)
-    if gp then return end
-    if input.KeyCode == Enum.KeyCode.RightControl then
-        Main.Visible = not Main.Visible
-    end
-end)
-
-log("Karma loaded. Press RightCtrl to toggle.", Color3.fromRGB(255,255,255))
-log("Type 'help' for commands.", Color3.fromRGB(140,140,140))
-\`\`\`
-
-**How to use:**
-- Press **Right Ctrl** to toggle the GUI
-- Type commands: \`speed 50\`, \`god\`, \`noclip\`, \`tp PlayerName\`
-- Click X or Right Ctrl to hide
-
-*Add your GLM API key in Settings for fully custom AI-generated scripts.*`;
-            }
-            
-            if (last.includes('rename') || last.includes('refactor') || last.includes('clean')) {
-                return `I'll refactor your code! Here's an example of what I do:
-
-**Before (messy):**
-\`\`\`lua
-local a = game.Players.LocalPlayer
-local b = a.Character or a.CharacterAdded:Wait()
-local c = b:FindFirstChild("HumanoidRootPart")
-local d = Instance.new("Part")
-d.Size = Vector3.new(3,1,3)
-d.Position = c.Position + Vector3.new(0,3,0)
-d.Parent = workspace
-d.Anchored = true
-d.BrickColor = BrickColor.new("Really red")
-\`\`\`
-
-**After (clean):**
-\`\`\`lua
--- Create a red platform above the player
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
-local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local rootPart = character:WaitForChild("HumanoidRootPart")
-
-local platform = Instance.new("Part")
-platform.Name = "SpawnPlatform"
-platform.Size = Vector3.new(3, 1, 3)
-platform.Position = rootPart.Position + Vector3.new(0, 3, 0)
-platform.Anchored = true
-platform.BrickColor = BrickColor.new("Really red")
-platform.Parent = workspace
-\`\`\`
-
-**Changes:**
-- \`a\` → \`LocalPlayer\` - descriptive name
-- \`b\` → \`character\` - clear purpose
-- \`c\` → \`rootPart\` - specific part
-- \`d\` → \`platform\` - describes the object
-- Added \`GetService("Players")\` - best practice
-- Added comment explaining the script
-- Set \`Name\` property for Studio identification
-
-**Upload your script file** with the paperclip button and I'll refactor your actual code!`;
-            }
-            
-            // Default fallback
-            return `I can help with that! Here's what I can do:
-
-**Script Generation**
-- Write complete Roblox scripts from your description
-- GUI systems, combat, tools, plugins, etc.
-
-**Code Modification**
-- Rename variables to be readable
-- Add comments and documentation
-- Restructure messy code into clean patterns
-
-**Debugging**
-- Find and fix errors in your scripts
-- Explain why something isn't working
-- Suggest performance improvements
-
-**Modernization**
-- Convert old scripts to latest Roblox API
-- Add Luau type annotations
-- Replace deprecated functions
-
-**To get started:**
-1. **Describe what you want** in detail, or
-2. **Upload a .lua file** using the paperclip icon
-
-**Try these:**
-- "Write a sprint system with stamina bar GUI"
-- "Make NPCs patrol between waypoints"
-- "Add a cooldown system to my ability script"
-- "Optimize this script for performance"
-
-*For fully custom AI-generated scripts, add your free GLM API key in Settings (top right).*`;
-        }
-        
-        // ============ TYPING ============
-        function showTyping() {
-            const c = document.getElementById('chatMsgs');
-            const d = document.createElement('div');
-            d.className = 'msg msg-a';
-            d.id = 'typMsg';
-            d.innerHTML = `<div class="msg-av">K</div><div class="msg-c"><div class="msg-r">Karma AI</div><div class="typing"><span></span><span></span><span></span></div></div>`;
-            c.appendChild(d);
-            c.scrollTop = c.scrollHeight;
-        }
-        
-        function hideTyping() {
-            const el = document.getElementById('typMsg');
-            if (el) el.remove();
-        }
-        
-        // ============ SETTINGS ============
-        function openSet() {
-            const modal = document.getElementById('setModal');
-            modal.classList.add('show');
-            
-            document.getElementById('apiKeyIn').value = apiKey;
-            document.getElementById('modelIn').value = modelName;
-        }
-        
-        function closeSet() {
-            document.getElementById('setModal').classList.remove('show');
-        }
-        
-        function saveSet() {
-            apiKey = document.getElementById('apiKeyIn').value.trim();
-            modelName = document.getElementById('modelIn').value.trim() || 'glm-4-flash';
-            
-            localStorage.setItem('karma_apikey', apiKey);
-            localStorage.setItem('karma_model', modelName);
-            
-            closeSet();
-            
-            if (apiKey) {
-                toast('API key saved', 'ok');
-            } else {
-                toast('Using built-in templates', 'ok');
-            }
-        }
-        
-        document.getElementById('setModal').addEventListener('click', function(e) {
-            if (e.target === this) closeSet();
-        });
-        
-        // ============ UTILS ============
-        function handleKey(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMsg();
-            }
-        }
-        
-        function autoR(el) {
-            el.style.height = 'auto';
-            el.style.height = Math.min(el.scrollHeight, 150) + 'px';
-        }
-        
-        function esc(s) {
-            const d = document.createElement('div');
-            d.textContent = s;
-            return d.innerHTML;
-        }
-        
-        function toast(msg, type) {
-            const c = document.getElementById('toastC');
-            const t = document.createElement('div');
-            t.className = `toast ${type || 'ok'}`;
-            
-            const icon = type === 'err' ? 'exclamation-circle' : 'check-circle';
-            t.innerHTML = `<i class="fas fa-${icon}"></i> ${esc(msg)}`;
-            
-            c.appendChild(t);
-            
-            setTimeout(() => {
-                if (t.parentNode) t.remove();
-            }, 3200);
-        }
-        
-        function toggleSB() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
-        
-        function closeSBMobile() {
-            document.getElementById('sidebar').classList.remove('open');
-        }
-        
-        document.querySelector('.chat-area').addEventListener('click', closeSBMobile);
-        
-        // ============ START ============
-        window.onload = function() {
-            init();
-        };
-        
-        // Optional: Add keyboard shortcut for auth
-        document.addEventListener('keydown', function(e) {
-            if (e.metaKey && e.key === "/") {
-                e.preventDefault();
-                const modal = document.getElementById('authModal');
-                if (modal.classList.contains('show')) {
-                    closeAuthModal();
-                } else {
-                    openAuthModal('signin');
-                }
-            }
-        });
+        // Start the app
+        window.onload = init;
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a194d604ef30fa80',t:'MTc4Mzc0MTc0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
